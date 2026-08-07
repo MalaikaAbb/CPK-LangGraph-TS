@@ -1,0 +1,24 @@
+{
+  "name": "langgraph-typescript-test-suite-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "langgraphjs dev --port 8123 --no-browser",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@copilotkit/sdk-js": "^1.66.2",
+    "@langchain/core": "^1.2.5",
+    "@langchain/langgraph": "^1.4.9",
+    "@langchain/openai": "^1.5.6",
+    "dotenv": "^16.4.7",
+    "langchain": "^1.2.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@langchain/langgraph-cli": "^1.4.4",
+    "@types/node": "^20",
+    "typescript": "^5"
+  }
+}

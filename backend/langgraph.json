@@ -1,0 +1,49 @@
+{
+  "node_version": "20",
+  "dependencies": ["."],
+  "env": "../.env",
+  "graphs": {
+    "sample_agent": "./src/agents/quickstart.ts:graph",
+
+    "agentic_chat": "./src/agents/chat-agents.ts:agenticChatGraph",
+    "prebuilt-sidebar": "./src/agents/chat-agents.ts:prebuiltSidebarGraph",
+    "prebuilt-popup": "./src/agents/chat-agents.ts:prebuiltPopupGraph",
+    "chat-controls": "./src/agents/chat-agents.ts:chatControlsGraph",
+
+    "chat-customization-css": "./src/agents/chat-agents.ts:chatCustomizationCssGraph",
+    "chat-slots": "./src/agents/chat-agents.ts:chatSlotsGraph",
+    "headless-simple": "./src/agents/chat-agents.ts:headlessSimpleGraph",
+    "headless-complete": "./src/agents/chat-agents.ts:headlessCompleteGraph",
+    "reasoning-default": "./src/agents/chat-agents.ts:reasoningDefaultGraph",
+    "reasoning-custom": "./src/agents/chat-agents.ts:reasoningCustomGraph",
+
+    "multimodal": "./src/agents/chat-agents.ts:multimodalGraph",
+    "voice-demo": "./src/agents/chat-agents.ts:voiceDemoGraph",
+    "programmatic-control": "./src/agents/chat-agents.ts:programmaticControlGraph",
+
+    "tool-rendering": "./src/agents/tool-rendering.ts:graph",
+    "gen-ui-tool-based": "./src/agents/frontend-tools.ts:genUiToolBasedGraph",
+    "a2ui-fixed-schema": "./src/agents/a2ui-fixed.ts:graph",
+    "declarative-gen-ui": "./src/agents/declarative-gen-ui.ts:graph",
+
+    "frontend_tools": "./src/agents/frontend-tools.ts:graph",
+    "hitl-in-chat": "./src/agents/frontend-tools.ts:hitlInChatGraph",
+    "interrupt-flow": "./src/agents/interrupt-flow.ts:graph",
+
+    "shared-state-read-write": "./src/agents/shared-state-read-write.ts:graph",
+    "shared-state-streaming": "./src/agents/shared-state-streaming.ts:graph",
+    "readonly-state-agent-context": "./src/agents/readonly-state.ts:graph",
+    "agent-app-context": "./src/agents/readonly-state.ts:agentAppContextGraph",
+    "shared-state-language": "./src/agents/shared-state-language.ts:graph",
+    "state-inputs-outputs": "./src/agents/state-inputs-outputs.ts:graph",
+    "predictive-state-updates": "./src/agents/predictive-state-updates.ts:graph",
+    "predictive-state-updates-manual": "./src/agents/predictive-state-updates-manual.ts:graph",
+    "predictive-state-updates-prebuilt": "./src/agents/predictive-state-updates-prebuilt.ts:graph",
+
+    "subagents": "./src/agents/subagents.ts:graph",
+    "subgraphs": "./src/agents/subgraphs.ts:graph",
+
+    "agent-config": "./src/agents/agent-config.ts:graph",
+    "configurable": "./src/agents/configurable.ts:graph"
+  }
+}
