@@ -3,6 +3,10 @@ import Link from "next/link";
 import { KeyValue, Panel } from "@/components/ui";
 import { AGENT_IDS } from "@/lib/agents";
 import { DOCS_ROOT } from "@/lib/nav-config";
+import { DocDriftPanel } from "@/components/doc-drift-panel";
+
+/** Dynamic: the doc-sync readouts below read the snapshot off disk. */
+export const dynamic = "force-dynamic";
 
 export default function Page() {
   return (
@@ -26,6 +30,9 @@ export default function Page() {
           its page teaches rather than describing it.
         </p>
       </header>
+
+
+      <DocDriftPanel />
 
       <Panel title="What this is">
         <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">

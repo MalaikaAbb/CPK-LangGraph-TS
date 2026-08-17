@@ -33,12 +33,39 @@ const AgentStateAnnotation = Annotation.Root({
 export type AgentState = typeof AgentStateAnnotation.State;
 
 //#region node
-async function agentNode(state: AgentState, config: RunnableConfig) {
-  // Pull the values from the provided config argument. `configurable` is
-  // LangGraph's own channel — CopilotKit forwards whatever the frontend put
-  // in `forwardedProps.config.configurable` straight through.
+/**
+ * The doc's node, verbatim. It reads `config.configurable` and returns state —
+ * that is the entire published snippet. It calls no model and appends no
+ * message, which is why on its own the route completes with an empty chat.
+ */
+async function agentNode(
+  state: AgentState,
+  config: RunnableConfig,
+): Promise<AgentState> {
   const authToken = config.configurable?.authToken ?? null;
-  console.log("agent_node received authToken:", authToken);
+  console.log("Auth Token: ", authToken);
+  return state;
+}
+//#endregion
+
+//#region reply
+/**
+ * This repo's. The doc's page is about *reading* execution config, not about
+ * building an agent — it assumes you already have one from the Quickstart. So
+ * the reply lives in its own node rather than being folded into the one above,
+ * which keeps the published snippet readable as published.
+ *
+ * It also demonstrates something the page states but never shows: the same
+ * `config.configurable` is available in *any* node, not just the first. This
+ * node reads the token independently — nothing was threaded through state,
+ * because `configurable` deliberately never touches state.
+ *
+ * Reporting the value back is what makes the route testable at all. Since
+ * `configurable` is not state, there is nothing in `agent.state` for the UI to
+ * inspect; the reply is the only observable evidence it arrived.
+ */
+async function replyNode(state: AgentState, config: RunnableConfig) {
+  const authToken = config.configurable?.authToken ?? null;
 
   const model = chatModel({ temperature: 0 });
 
@@ -47,8 +74,9 @@ async function agentNode(state: AgentState, config: RunnableConfig) {
       "You are a helpful assistant running with per-run execution config.",
       "Config received for this run:",
       `- authToken: ${authToken ?? "(not provided)"}`,
-      "If the user asks what configuration you were given, report exactly " +
-        "these values. Never claim a value you were not given.",
+      "Open with one short line stating the authToken you were given, quoted " +
+        "exactly, or that you were given none. Then answer the user normally. " +
+        "Never claim a value you were not given.",
     ].join("\n"),
   });
 
@@ -60,7 +88,9 @@ async function agentNode(state: AgentState, config: RunnableConfig) {
 
 const workflow = new StateGraph(AgentStateAnnotation)
   .addNode("agent_node", agentNode)
+  .addNode("reply_node", replyNode)
   .addEdge(START, "agent_node")
-  .addEdge("agent_node", "__end__");
+  .addEdge("agent_node", "reply_node")
+  .addEdge("reply_node", "__end__");
 
 export const graph = workflow.compile({ checkpointer: new MemorySaver() });

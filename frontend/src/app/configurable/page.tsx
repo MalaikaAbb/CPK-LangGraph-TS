@@ -40,6 +40,31 @@ export default function Page() {
         description="Pull the values off `config.configurable` in any node."
       >
         <SourceCode file="backend/src/agents/configurable.ts" region="node" />
+        <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
+          That is the published snippet in full: read <code>configurable</code>,
+          return state. It calls no model and appends no message, so on its own
+          it produces a run that finishes with an empty chat. The page assumes
+          you already have an agent from the Quickstart and is only showing you
+          where the values arrive.
+        </p>
+      </Panel>
+
+      <Panel
+        title="The node that replies"
+        description="This repo's — the doc has no equivalent, and without one the route has nothing to show."
+      >
+        <SourceCode file="backend/src/agents/configurable.ts" region="reply" />
+        <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
+          Kept as a second node rather than folded into the first, so the
+          published snippet stays readable as published. It also demonstrates
+          something the page asserts but never shows: the same{" "}
+          <code>config.configurable</code> is available in <em>any</em> node.
+          This one re-reads the token independently — nothing was threaded
+          through state, because <code>configurable</code> never touches state.
+          That is also why the reply exists at all: with nothing in{" "}
+          <code>agent.state</code> to inspect, the model&apos;s answer is the
+          only observable evidence the value arrived.
+        </p>
       </Panel>
 
       <Panel

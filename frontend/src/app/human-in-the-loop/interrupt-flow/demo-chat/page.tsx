@@ -126,11 +126,29 @@ function SingleInterruptTab() {
 // Tab 2 — the page's "Condition UI executions" section, verbatim.
 // ---------------------------------------------------------------------------
 
+/**
+ * The doc's `enabled` predicates destructure `eventValue`, which the shipped
+ * hook does not pass — it passes the legacy event, `{ name, value }`. So the
+ * published expression cannot typecheck against the real signature.
+ *
+ * This wrapper is the minimum needed to mount it unchanged: it types the
+ * argument the way the doc assumes, then widens the result so `useInterrupt`
+ * accepts it. The lambda bodies below are the page's, character for character.
+ *
+ * Deliberately not a `@ts-expect-error`: that sits above the line, reads like
+ * lint noise, and gets tidied away — which breaks the build rather than the
+ * tab. See README §9 items 1 and 15.
+ */
+type DocInterruptEvent = { eventValue: { type: string } };
+
+function docPredicate(fn: (event: DocInterruptEvent) => boolean) {
+  return fn as never;
+}
+
 function MultipleInterruptTab() {
   useInterrupt({
     agentId: AGENT_ID,
-    
-    enabled: ({ eventValue }) => eventValue.type === "ask",
+    enabled: docPredicate(({ eventValue }) => eventValue.type === "ask"),
     render: ({ event, resolve }) => (
       <AskComponent
         question={(event.value as { content: string }).content}
@@ -141,8 +159,7 @@ function MultipleInterruptTab() {
 
   useInterrupt({
     agentId: AGENT_ID,
-  
-    enabled: ({ eventValue }) => eventValue.type === "approval",
+    enabled: docPredicate(({ eventValue }) => eventValue.type === "approval"),
     render: ({ event, resolve }) => (
       <ApproveComponent
         content={(event.value as { content: string }).content}
