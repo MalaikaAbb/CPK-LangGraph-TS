@@ -62,8 +62,11 @@ without data bindings (like `Title` or `Arrow`) carry their value
 inline; components bound to the LLM's data (like `Airport`) reference
 fields via JSON Pointer paths such as `{ "path": "/origin" }`. The
 A2UI binder resolves those paths *before* the React renderer runs, so
-renderer props are typed as their resolved values (plain `z.string()`,
-not a path-or-literal union).
+your renderer receives the resolved value and never sees the path — but
+the *definition* still has to declare that prop as a literal-or-binding
+union, because that union is the only signal the binder has that the
+prop is bindable. See [Declare the component
+definitions](#declare-the-component-definitions).
 
 ## The 5-component custom catalog
 
@@ -74,10 +77,58 @@ CopilotKit's basic catalog (Card, Column, Row, Text, Button, …) via
 
 <Steps>
 <Step>
+### Install the renderer package
+
+The catalog, definitions and renderers below all import from
+`@copilotkit/a2ui-renderer`. It ships separately from
+`@copilotkit/react-core`, and the definitions use `zod` for prop schemas:
+
+```npm
+npm install @copilotkit/a2ui-renderer zod
+```
+</Step>
+
+<Step>
 ### Declare the component definitions
 
-Each component declares its props as a Zod schema. Props are the
-*resolved* values, never the path expressions:
+Each component declares its props as a Zod schema. Any prop the schema
+binds to the data model — anything that can arrive as
+`{ "path": "/origin" }` rather than a literal — **must** be declared as a
+union of the literal type and the binding object. That is what the
+`DynString` helper below is for, and why `Airport`'s `code` uses it
+rather than a plain `z.string()`.
+
+The binder decides whether to resolve a prop by *inspecting its Zod
+type*: a union with a `{ path }` member is treated as dynamic and
+resolved against the data model, while a plain literal type is treated
+as static and passed through untouched. So declaring a bound prop as
+`z.string()` does not merely lose type precision — it tells the binder
+not to resolve it, and the raw `{ path: "/origin" }` object reaches your
+renderer.
+
+<Callout type="warn" title="Plain `z.string()` on a bound prop crashes the render">
+  Because the unresolved object reaches the renderer, the first thing
+  that renders it as text throws React's
+  [error #31](https://react.dev/errors/31):
+  `Objects are not valid as a React child (found: object with keys {path})`.
+  Nothing in that message points at the schema, so it reads as a renderer
+  bug rather than a missing union. If you hit it, check the prop's
+  declared type first.
+
+  Props that are never bound (`Arrow`, or a `variant` enum) are fine as
+  plain types. This applies only to props the schema binds.
+</Callout>
+
+Once the union is declared, the binder resolves the path before your
+renderer runs, so the renderer still receives a plain string — the union
+describes what the *schema* may send, not what the renderer must handle.
+`@copilotkit/a2ui-renderer` re-exports A2UI's canonical
+`DynamicStringSchema` (plus `DynamicNumberSchema`, `DynamicBooleanSchema`
+and the matching types) if you would rather not hand-roll the union:
+
+```ts
+import { DynamicStringSchema } from "@copilotkit/a2ui-renderer";
+```
 
 ```typescript
 // src/app/demos/a2ui-fixed-schema/a2ui/definitions.ts
@@ -283,7 +334,7 @@ export const catalog = createCatalog(definitions, renderers, {
 ```
 </Step>
 
-<WhenFrameworkHas flag="a2ui_pattern" equals="schema-loading">
+
 <Step>
 ### Load the schema JSON at startup
 
@@ -457,310 +508,18 @@ const displayFlight = tool(
   },
 );
 ```
-</Step>
-</WhenFrameworkHas>
 
-<WhenFrameworkHas flag="a2ui_pattern" equals="schema-inline">
-<Step>
-### Define the schema inline
-
-Spring AI / .NET don't ship a `load_schema` JSON helper, so the
-component tree is declared inline as a typed literal in source,
-equivalent to deserialising a `flight_schema.json` but compiled into
-the agent class. The structure is identical to the JSON form; only
-the surface syntax changes:
-
-```typescript
-// src/agent/a2ui-fixed.ts
-import { readFileSync } from "fs";
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
-
-import { z } from "zod";
-import { RunnableConfig } from "@langchain/core/runnables";
-import { tool } from "@langchain/core/tools";
-import { ToolNode } from "@langchain/langgraph/prebuilt";
-import { AIMessage, SystemMessage } from "@langchain/core/messages";
-import {
-  MemorySaver,
-  START,
-  StateGraph,
-  Annotation,
-} from "@langchain/langgraph";
-import { ChatOpenAI } from "@langchain/openai";
-import { makeChatOpenAI } from "./openai-headers";
-
-import {
-  convertActionsToDynamicStructuredTools,
-  CopilotKitStateAnnotation,
-} from "@copilotkit/sdk-js/langgraph";
-
-const CATALOG_ID = "copilotkit://flight-fixed-catalog";
-const SURFACE_ID = "flight-fixed-schema";
-const A2UI_OPERATIONS_KEY = "a2ui_operations";
-
-// Schemas are JSON so they can be authored and reviewed independently of the
-// agent code.
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const SCHEMAS_DIR = join(__dirname, "a2ui_schemas");
-
-function loadSchema(filename: string): unknown[] {
-  const full = join(SCHEMAS_DIR, filename);
-  return JSON.parse(readFileSync(full, "utf-8")) as unknown[];
-}
-
-const FLIGHT_SCHEMA = loadSchema("flight_schema.json");
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const BOOKED_SCHEMA = loadSchema("booked_schema.json");
-```
+Nothing about A2UI depends on how the agent itself is built — the operations
+container is just the tool's return value, so the tool drops into whatever agent
+you already have.
 </Step>
 
-<Step>
-### Return render operations from the tool
 
-The agent tool builds the same `createSurface` + `updateComponents` +
-`updateDataModel` operations container and returns it. The A2UI
-middleware detects the operations in the tool result and forwards
-them to the frontend renderer; the LLM only supplies the four data
-fields:
 
-```typescript
-// src/agent/a2ui-fixed.ts
-import { readFileSync } from "fs";
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
 
-import { z } from "zod";
-import { RunnableConfig } from "@langchain/core/runnables";
-import { tool } from "@langchain/core/tools";
-import { ToolNode } from "@langchain/langgraph/prebuilt";
-import { AIMessage, SystemMessage } from "@langchain/core/messages";
-import {
-  MemorySaver,
-  START,
-  StateGraph,
-  Annotation,
-} from "@langchain/langgraph";
-import { ChatOpenAI } from "@langchain/openai";
-import { makeChatOpenAI } from "./openai-headers";
 
-import {
-  convertActionsToDynamicStructuredTools,
-  CopilotKitStateAnnotation,
-} from "@copilotkit/sdk-js/langgraph";
 
-const CATALOG_ID = "copilotkit://flight-fixed-catalog";
-const SURFACE_ID = "flight-fixed-schema";
-const A2UI_OPERATIONS_KEY = "a2ui_operations";
 
-// Schemas are JSON so they can be authored and reviewed independently of the
-// agent code.
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const SCHEMAS_DIR = join(__dirname, "a2ui_schemas");
-
-function loadSchema(filename: string): unknown[] {
-  const full = join(SCHEMAS_DIR, filename);
-  return JSON.parse(readFileSync(full, "utf-8")) as unknown[];
-}
-
-const FLIGHT_SCHEMA = loadSchema("flight_schema.json");
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const BOOKED_SCHEMA = loadSchema("booked_schema.json");
-
-const AgentStateAnnotation = Annotation.Root({
-  ...CopilotKitStateAnnotation.spec,
-});
-
-export type AgentState = typeof AgentStateAnnotation.State;
-
-function createSurfaceOp(surfaceId: string, catalogId: string) {
-  return {
-    version: "v0.9",
-    createSurface: { surfaceId, catalogId },
-  };
-}
-
-function updateComponentsOp(surfaceId: string, components: unknown[]) {
-  return {
-    version: "v0.9",
-    updateComponents: { surfaceId, components },
-  };
-}
-
-function updateDataModelOp(
-  surfaceId: string,
-  data: unknown,
-  path: string = "/",
-) {
-  return {
-    version: "v0.9",
-    updateDataModel: { surfaceId, path, value: data },
-  };
-}
-
-function renderA2uiOperations(operations: unknown[]): string {
-  return JSON.stringify({ [A2UI_OPERATIONS_KEY]: operations });
-}
-
-const displayFlight = tool(
-  async ({
-    origin,
-    destination,
-    airline,
-    price,
-  }: {
-    origin: string;
-    destination: string;
-    airline: string;
-    price: string;
-  }) => {
-    return renderA2uiOperations([
-      createSurfaceOp(SURFACE_ID, CATALOG_ID),
-      updateComponentsOp(SURFACE_ID, FLIGHT_SCHEMA),
-      updateDataModelOp(SURFACE_ID, { origin, destination, airline, price }),
-    ]);
-  },
-  {
-    name: "display_flight",
-    description:
-      'Show a flight card for the given trip. Use short airport codes (e.g. "SFO", "JFK") for origin/destination and a price string like "$289".',
-    schema: z.object({
-      origin: z.string(),
-      destination: z.string(),
-      airline: z.string(),
-      price: z.string(),
-    }),
-  },
-);
-```
-</Step>
-</WhenFrameworkHas>
-
-<WhenFrameworkHas flag="a2ui_pattern" equals="llm-driven">
-<Step>
-### Generate the schema dynamically
-
-Mastra and Strands take a different route: the agent tool runs a
-*secondary* LLM call with a forced tool choice that produces the
-operations container per-request. The frontend catalog is still fixed
-(same `Title`/`Airport`/`Arrow`/`AirlineBadge`/`PriceTag` primitives),
-but the schema is built on the fly. Schema construction and render
-emission happen in the same tool call:
-
-```typescript
-// src/agent/a2ui-fixed.ts
-import { readFileSync } from "fs";
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
-
-import { z } from "zod";
-import { RunnableConfig } from "@langchain/core/runnables";
-import { tool } from "@langchain/core/tools";
-import { ToolNode } from "@langchain/langgraph/prebuilt";
-import { AIMessage, SystemMessage } from "@langchain/core/messages";
-import {
-  MemorySaver,
-  START,
-  StateGraph,
-  Annotation,
-} from "@langchain/langgraph";
-import { ChatOpenAI } from "@langchain/openai";
-import { makeChatOpenAI } from "./openai-headers";
-
-import {
-  convertActionsToDynamicStructuredTools,
-  CopilotKitStateAnnotation,
-} from "@copilotkit/sdk-js/langgraph";
-
-const CATALOG_ID = "copilotkit://flight-fixed-catalog";
-const SURFACE_ID = "flight-fixed-schema";
-const A2UI_OPERATIONS_KEY = "a2ui_operations";
-
-// Schemas are JSON so they can be authored and reviewed independently of the
-// agent code.
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const SCHEMAS_DIR = join(__dirname, "a2ui_schemas");
-
-function loadSchema(filename: string): unknown[] {
-  const full = join(SCHEMAS_DIR, filename);
-  return JSON.parse(readFileSync(full, "utf-8")) as unknown[];
-}
-
-const FLIGHT_SCHEMA = loadSchema("flight_schema.json");
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const BOOKED_SCHEMA = loadSchema("booked_schema.json");
-
-const AgentStateAnnotation = Annotation.Root({
-  ...CopilotKitStateAnnotation.spec,
-});
-
-export type AgentState = typeof AgentStateAnnotation.State;
-
-function createSurfaceOp(surfaceId: string, catalogId: string) {
-  return {
-    version: "v0.9",
-    createSurface: { surfaceId, catalogId },
-  };
-}
-
-function updateComponentsOp(surfaceId: string, components: unknown[]) {
-  return {
-    version: "v0.9",
-    updateComponents: { surfaceId, components },
-  };
-}
-
-function updateDataModelOp(
-  surfaceId: string,
-  data: unknown,
-  path: string = "/",
-) {
-  return {
-    version: "v0.9",
-    updateDataModel: { surfaceId, path, value: data },
-  };
-}
-
-function renderA2uiOperations(operations: unknown[]): string {
-  return JSON.stringify({ [A2UI_OPERATIONS_KEY]: operations });
-}
-
-const displayFlight = tool(
-  async ({
-    origin,
-    destination,
-    airline,
-    price,
-  }: {
-    origin: string;
-    destination: string;
-    airline: string;
-    price: string;
-  }) => {
-    return renderA2uiOperations([
-      createSurfaceOp(SURFACE_ID, CATALOG_ID),
-      updateComponentsOp(SURFACE_ID, FLIGHT_SCHEMA),
-      updateDataModelOp(SURFACE_ID, { origin, destination, airline, price }),
-    ]);
-  },
-  {
-    name: "display_flight",
-    description:
-      'Show a flight card for the given trip. Use short airport codes (e.g. "SFO", "JFK") for origin/destination and a price string like "$289".',
-    schema: z.object({
-      origin: z.string(),
-      destination: z.string(),
-      airline: z.string(),
-      price: z.string(),
-    }),
-  },
-);
-```
-</Step>
-</WhenFrameworkHas>
 </Steps>
 
 ## Why compositional beats monolithic
@@ -801,6 +560,8 @@ const runtime = new CopilotRuntime({
 });
 ```
 
+<!-- setup skipped: a2ui-fixed-schema-setup is not bundled for langgraph-typescript -->
+
 ## Action handlers (reference)
 
 The canonical reference pairs fixed schemas with
@@ -829,9 +590,10 @@ When available, a button declares its action like this:
 ```
 
 And the Python tool matches it with a handler keyed by the action
-name (plus a `"*"` catch-all). Until the SDK lands, see the reference
-[fixed-schema guide](/integrations/langgraph/generative-ui/a2ui/fixed-schema)
-for the full pattern.
+name (plus a `"*"` catch-all). Until the SDK lands, handle the click on the
+frontend instead — see
+[Advanced — Action Handlers](./advanced#action-handlers) for the
+`createA2UIMessageRenderer` / `onAction` pattern.
 
 ## When should I use fixed schemas?
 
