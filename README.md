@@ -292,6 +292,39 @@ The tracked set is the 34 pages this repo was scoped to. The live sidebar also c
 
 Ordered by how likely each is to cost you time.
 
+Realtime/threads findings below were verified against **1.69.3**.
+
+### Realtime thread sockets cannot survive a reconnect (1.69.3)
+
+Symptom: the agent stops responding, and the console fills with `realtime channel join timed out`, `realtime socket errored`, `WebSocket failed after 5 attempts, giving up`, and finally `Timed out joining channel` from `agent_run_failed`.
+
+Three defects compound, all in `@copilotkit/core`:
+
+1. **`join_token` is single use, but passed as a frozen param.** Verified against the platform: a fresh token upgrades `101`, the same token replayed returns `403`, from any origin. Core passes it as `params: { join_token: joinToken }`, and Phoenix's `endPointURL()` re-appends the socket's stored params on every `connect()` — including automatic reconnects, and including re-subscribes caused by `shareReplay({ refCount: true })`. Phoenix calls `this.params()` as a *function* precisely so credentials can be refreshed per connect; a frozen object makes reconnection impossible by construction. Replaying a spent token produces a silent 403 loop — the socket never opens, so the channel join never answers and simply times out.
+2. **Nothing refetches credentials.** There is no `retry`/`retryWhen` anywhere in core, so no layer re-enters the `defer()` that would mint a fresh token.
+3. **One socket per agent, for a per-user topic.** `ɵphoenixSocket$` does `new Socket(...)` per store with no cache, while the thread topic is `user_meta:<joinCode>` and `joinCode` is per *user* — every agent returns the identical value. With 34 agents registered that is 34 sockets carrying the same payload.
+
+The agent run is collateral damage, not the cause: it joins through the strict `ɵjoinPhoenixChannel$` variant that throws instead of logging. Driving the real client library outside a browser — `connectAgent`, `runAgent`, then a re-run on the same agent — all succeed, so the pipeline itself is sound; the failure is triggered by something tearing the socket down in the browser.
+
+**Workaround in this repo:** `src/components/rest-only-thread-stores.tsx` pre-registers a REST-only thread store (no `wsUrl`) for every agent except `sample_agent`, exploiting `ensureOwnedThreadStore`'s "don't overwrite a store already registered by `useThreads()`" guard. One socket instead of 34. It imports the internal `ɵcreateThreadStore`, so revisit it on any version bump, and delete it once upstream fixes 1 and 2.
+
+**Second workaround:** the Inspector is what turns this from waste into a broken agent — with it mounted the run fails, with it off the same agent runs (A/B verified, and `reactStrictMode: false` ruled React's double-invoked effects out). So `src/lib/inspector.ts` suppresses the Inspector on the Rich Threads subtrees only (`INSPECTOR_SUPPRESSED_PREFIXES`), keeping it everywhere else. Those are the routes that actually exercise realtime threads, so they are the ones that must stay runnable.
+
+### `showDevConsole` is accepted but never read by `CopilotKitProvider` (1.69.3)
+
+`CopilotKitProviderProps` declares both `showDevConsole` and `enableInspector`, so `showDevConsole={false}` typechecks — but the v2 provider never destructures it. The only gate is:
+
+```js
+shouldEnableInspector({ enableInspector, isBrowser, isDevelopment })
+  => isBrowser && isDevelopment && enableInspector !== false
+```
+
+So the inspector mounts in dev unless `enableInspector` is *explicitly* `false`, and passing `showDevConsole` fails silently. This repo passes `enableInspector` — see `src/lib/inspector.ts`. It also silently defeated `NESTED_PROVIDER_ROUTES`, mounting two inspectors on the routes that bring their own provider. Note the inspector is dev-only, so it does not exist at all in a production build.
+
+### `inspectorDefaultAnchor` was removed with no replacement (1.69.3)
+
+The prop is gone from `CopilotKitProviderProps` and the provider exposes no positioning control at all, so on routes mounting the prebuilt Popup or Sidebar the inspector button overlaps their launchers.
+
 **1. `useInterrupt`'s `enabled` predicate has a different signature than documented.**
 [Interrupts](https://docs.copilotkit.ai/langgraph-typescript/human-in-the-loop/interrupt-flow) writes it as `enabled: ({ eventValue }) => eventValue.type === 'ask'`. In `@copilotkit/react-core@1.66.2` the predicate receives the legacy event itself — `InterruptEvent<T>`, i.e. `{ name, value }` — so the payload is on `.value` and destructuring `eventValue` yields `undefined`. Copied as written, both hooks return `false` for every interrupt and the run hangs with no UI and no error. Fixed here in `frontend/src/app/human-in-the-loop/interrupt-flow/demo-chat/page.tsx`.
 

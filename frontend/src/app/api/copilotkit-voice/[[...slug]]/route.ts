@@ -1,6 +1,5 @@
 import type { NextRequest } from "next/server";
 import {
-  CopilotRuntime,
   TranscriptionService,
   createCopilotRuntimeHandler,
 } from "@copilotkit/runtime/v2";
@@ -10,6 +9,7 @@ import { TranscriptionServiceOpenAI } from "@copilotkit/voice";
 import OpenAI from "openai";
 
 import { LANGGRAPH_URL, LANGSMITH_API_KEY, VOICE_AGENT_ID } from "@/lib/agents";
+import { buildRuntime } from "@/lib/copilot-runtime";
 
 /**
  * The Voice page publishes this file almost in full, and it is the reason the
@@ -70,7 +70,9 @@ let cachedHandler: ((req: Request) => Promise<Response>) | null = null;
 function getHandler(): (req: Request) => Promise<Response> {
   if (cachedHandler) return cachedHandler;
 
-  const runtime = new CopilotRuntime({
+  // Shares `buildRuntime`, so Intelligence and per-user threads work here too;
+  // `transcriptionService` is the one option unique to this endpoint.
+  const runtime = buildRuntime({
     agents: {
       // The page mounts <CopilotKit agent="voice-demo">; resolve that to the
       // voice graph in backend/langgraph.json.
