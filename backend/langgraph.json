@@ -32,7 +32,7 @@
 
     "shared-state-read-write": "./src/agents/shared-state-read-write.ts:graph",
     "shared-state-streaming": "./src/agents/shared-state-streaming.ts:graph",
-    "readonly-state-agent-context": "./src/agents/readonly-state.ts:graph",
+   
     "agent-app-context": "./src/agents/readonly-state.ts:agentAppContextGraph",
     "shared-state-language": "./src/agents/shared-state-language.ts:graph",
     "state-inputs-outputs": "./src/agents/state-inputs-outputs.ts:graph",
