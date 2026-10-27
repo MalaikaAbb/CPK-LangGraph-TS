@@ -3,21 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "NODE_OPTIONS=--max-old-space-size=4096 next dev",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ag-ui/client": "0.0.57",
-    "@ag-ui/core": "0.0.57",
-    "@copilotkit/a2ui-renderer": "^1.69.3",
-    "@copilotkit/react-core": "^1.69.3",
-    "@copilotkit/runtime": "^1.69.3",
-    "@copilotkit/voice": "^1.69.3",
-    "lucide-react": "^0.525.0",
-    "next": "16.3.0",
+    "@ag-ui/client": "1.0.3",
+    "@ag-ui/core": "1.0.3",
+    "@copilotkit/a2ui-renderer": "^1.80.0",
+    "@copilotkit/react-core": "^1.80.0",
+    "@copilotkit/runtime": "^1.80.0",
+    "@copilotkit/voice": "^1.80.0",
+    "lucide-react": "^0.577.0",
+    "next": "16.3.8",
     "openai": "^5.9.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
@@ -37,7 +37,7 @@
     "typescript": "^5"
   },
   "overrides": {
-    "@ag-ui/client": "0.0.57",
-    "@ag-ui/core": "0.0.57"
+    "@ag-ui/client": "1.0.3",
+    "@ag-ui/core": "1.0.3"
   }
 }
