@@ -1,138 +1,238 @@
+
 "use client";
 
+import React, { useState } from "react";
 import {
-  CopilotChatConfigurationProvider,
+  CopilotKit,
   CopilotSidebar,
-  useCopilotChatConfiguration,
 } from "@copilotkit/react-core/v2";
-import { useState } from "react";
 
-import { DemoFrame } from "@/components/demo-frame";
+type FeedbackItem = {
+  messageId: string;
+  value: "up" | "down";
+};
 
-type Feedback = { messageId: string; value: "up" | "down" };
+type FeedbackEvent = {
+  messageId: string;
+  value: "up" | "down";
+};
 
-/**
- * Both halves of the Open/close/feedback page in one surface.
- *
- * The wrapping `<CopilotChatConfigurationProvider>` is load-bearing, and it is
- * the part that is easy to get wrong. `useCopilotChatConfiguration()` returns
- * modal state only when some provider *above the calling component* owns it.
- * `<CopilotSidebar>` does create one — but it creates it **inside itself**, and
- * it takes no children, so a button rendered as its sibling sees nothing and
- * `setModalOpen` comes back undefined. Both buttons then hit their
- * `if (!config?.setModalOpen) return null` guard and silently render nothing.
- *
- * Hoisting a provider above both fixes it, which is what the doc means by
- * "if you compose chat yourself, wrap the relevant subtree". Nesting is safe:
- * a child provider syncs to its parent in both directions, so the sidebar's
- * own toggle and these buttons drive the same state and stay in agreement.
- */
-export default function Page() {
-  const [feedback, setFeedback] = useState<Feedback[]>([]);
+// Local analytics implementation.
+// Replace this with your analytics provider when needed.
+const analytics = {
+  track: (eventName: string, data: FeedbackEvent) => {
+    console.log(`[Analytics] ${eventName}`, data);
+  },
+};
+
+export default function PrebuiltSidebarDemo() {
+  const [chatOpen, setChatOpen] = useState(false);
+  const [feedback, setFeedback] =
+    useState<FeedbackItem | null>(null);
+
+  const handleFeedback = (
+    messageId: string,
+    value: "up" | "down",
+  ) => {
+    setFeedback({ messageId, value });
+  };
 
   return (
-    <DemoFrame
-      parentPath="/prebuilt-components/chat-controls"
-      subtitle="agent: chat-controls"
-    >
-      <CopilotChatConfigurationProvider
-        agentId="chat-controls"
-        isModalDefaultOpen={false}
+    <>
+      <main
+        style={{
+          minHeight: "100vh",
+          padding: "48px 24px",
+          background: "#f8fafc",
+          color: "#0f172a",
+          fontFamily:
+            "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif",
+        }}
       >
-        <div className="h-full overflow-hidden">
-          <CopilotSidebar
-            agentId="chat-controls"
-            defaultOpen={false}
-            messageView={{
-              assistantMessage: {
-                onThumbsUp: (message: { id: string }) =>
-                  setFeedback((f) => [
-                    ...f,
-                    { messageId: message.id, value: "up" },
-                  ]),
-                onThumbsDown: (message: { id: string }) =>
-                  setFeedback((f) => [
-                    ...f,
-                    { messageId: message.id, value: "down" },
-                  ]),
-              },
+        <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "7px 12px",
+              borderRadius: "999px",
+              background: "#dbeafe",
+              color: "#1d4ed8",
+              fontSize: "13px",
+              fontWeight: 600,
+              marginBottom: "18px",
             }}
-          />
-          <MainContent feedback={feedback} />
-        </div>
-      </CopilotChatConfigurationProvider>
-    </DemoFrame>
-  );
-}
+          >
+            <span aria-hidden="true">✦</span>
+            AI ASSISTANT
+          </div>
 
-function MainContent({ feedback }: { feedback: Feedback[] }) {
-  return (
-    <main className="h-full overflow-y-auto p-10">
-      <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-        Chat controls
-      </h1>
+          <h1
+            style={{
+              margin: "0 0 12px",
+              fontSize: "clamp(30px, 5vw, 44px)",
+              fontWeight: 750,
+              letterSpacing: "-1.5px",
+            }}
+          >
+            Your AI workspace
+          </h1>
 
-      <div className="mt-6 flex flex-wrap gap-3">
-        <OpenChatButton />
-        <ToggleChatButton />
-      </div>
-
-      <section className="mt-8">
-        <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-          Captured feedback
-        </h2>
-        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-          The thumbs buttons only render because handlers were passed to the
-          assistant message slot. Each fires with the message it belongs to.
-        </p>
-        {feedback.length === 0 ? (
-          <p className="mt-3 rounded-lg border border-dashed border-slate-300 px-4 py-6 text-center text-sm text-slate-500 dark:border-slate-700">
-            Send a message, then rate the reply.
+          <p
+            style={{
+              maxWidth: "560px",
+              margin: "0 0 28px",
+              color: "#64748b",
+              fontSize: "16px",
+              lineHeight: 1.7,
+            }}
+          >
+            Get answers, explore ideas, and work smarter with your
+            personal AI assistant.
           </p>
-        ) : (
-          <ul className="mt-3 space-y-1.5">
-            {feedback.map((f, i) => (
-              <li
-                key={`${f.messageId}-${i}`}
-                className="rounded-lg border border-slate-200 px-3 py-2 font-mono text-xs dark:border-slate-800"
+
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              gap: "12px",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setChatOpen(true)}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                padding: "13px 22px",
+                border: "1px solid #2563eb",
+                borderRadius: "12px",
+                background: "#2563eb",
+                color: "#ffffff",
+                fontSize: "15px",
+                fontWeight: 650,
+                cursor: "pointer",
+                boxShadow: "0 5px 14px rgba(37,99,235,0.22)",
+              }}
+            >
+              <span aria-hidden="true">✦</span>
+              Ask the assistant
+              <span aria-hidden="true">→</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setChatOpen(false)}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "9px",
+                padding: "13px 20px",
+                border: "1px solid #cbd5e1",
+                borderRadius: "12px",
+                background: "#ffffff",
+                color: "#334155",
+                fontSize: "15px",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              <span aria-hidden="true">✕</span>
+              Close assistant
+            </button>
+          </div>
+
+          {feedback && (
+            <div
+              role="status"
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "12px",
+                maxWidth: "560px",
+                marginTop: "24px",
+                padding: "16px",
+                border: "1px solid #bbf7d0",
+                borderRadius: "12px",
+                background: "#f0fdf4",
+                color: "#166534",
+              }}
+            >
+              <div>
+                <div style={{ fontWeight: 650 }}>
+                  {feedback.value === "up"
+                    ? "👍 Thanks for your feedback!"
+                    : "👎 Thanks! We'll use your feedback to improve."}
+                </div>
+                <div
+                  style={{
+                    marginTop: "5px",
+                    fontSize: "13px",
+                    overflowWrap: "anywhere",
+                  }}
+                >
+                  Message ID: {feedback.messageId}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setFeedback(null)}
+                style={{
+                  border: "none",
+                  background: "transparent",
+                  color: "#166534",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  padding: "6px",
+                }}
               >
-                {f.value === "up" ? "👍" : "👎"} {f.messageId}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    </main>
-  );
-}
+                Dismiss
+              </button>
+            </div>
+          )}
+        </div>
 
-function OpenChatButton() {
-  const config = useCopilotChatConfiguration();
+        <CopilotSidebar
+          agentId="chat-controls"
+          open={chatOpen}
+          onOpenChange={setChatOpen}
+          labels={{
+            modalHeaderTitle: "Sidebar Assistant",
+            welcomeMessageText: "How can I help you today?",
+          }}
+          messageView={{
+            assistantMessage: {
+              onThumbsUp: (message) => {
+                const data: FeedbackEvent = {
+                  messageId: message.id,
+                  value: "up",
+                };
 
-  // setModalOpen is only present when a provider in the tree owns modal state
-  // (the prebuilt CopilotPopup / CopilotSidebar create it for you).
-  if (!config?.setModalOpen) return null;
+                analytics.track("feedback", data);
+                handleFeedback(data.messageId, data.value);
+              },
 
-  return (
-    <button
-      onClick={() => config.setModalOpen?.(true)}
-      className="rounded-md bg-[var(--accent)] px-3 py-1.5 text-sm font-medium text-white"
-    >
-      Ask the assistant
-    </button>
-  );
-}
+              onThumbsDown: (message) => {
+                const data: FeedbackEvent = {
+                  messageId: message.id,
+                  value: "down",
+                };
 
-function ToggleChatButton() {
-  const config = useCopilotChatConfiguration();
-  if (!config?.setModalOpen) return null;
-
-  return (
-    <button
-      onClick={() => config.setModalOpen?.(!config.isModalOpen)}
-      className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 dark:border-slate-700 dark:text-slate-200"
-    >
-      {config.isModalOpen ? "Close chat" : "Open chat"}
-    </button>
+                analytics.track("feedback", data);
+                handleFeedback(data.messageId, data.value);
+              },
+            },
+          }}
+        />
+      </main>
+    </>
   );
 }
