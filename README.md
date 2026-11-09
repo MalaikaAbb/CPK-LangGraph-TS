@@ -206,6 +206,10 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | `/frontend-tools` | A tool that executes in the browser and changes the page. | "Make the background a sunset gradient" | **Pass:** the page background changes. **Fail:** the agent describes a gradient in prose. |
 | `/human-in-the-loop` | `useHumanInTheLoop` suspending the run behind a picker. | "Book an intro call with sales" | **Pass:** picker renders, nothing streams until you pick, then the confirmation names your slot. **Fail:** the run continues under the picker → `respond` was never called. |
 | `/human-in-the-loop/interrupt-flow` | LangGraph's own `interrupt()`, plus two `useInterrupt` hooks split by `enabled`. | "Hello" | **Pass:** an *ask* card, then an *approval* card, then the reply — using the name you typed. Second message: no cards. **Fail:** immediate reply → the `agentId` on the hook does not match the registered id. |
+| `/human-in-the-loop/index` | The HITL overview's demo: `useHumanInTheLoop` with an in-chat time picker (Code tab verbatim). | "Book a call with sales to discuss pricing" | **Pass:** a picker card; the agent confirms the chosen slot. **Fail:** a time proposed in text, with no card. |
+| `/human-in-the-loop/useInterrupt` | `interrupt()` inside a backend tool; `useInterrupt` renders the picker in the chat and `resolve()` resumes. | "Schedule a call with Alice about the Q3 roadmap" | **Pass:** in-chat picker → "Booked" → agent confirms. **Fail:** hanging run with no card. |
+| `/human-in-the-loop/headless` | The same interrupt resolved from the app surface via a hand-rolled `useHeadlessInterrupt`. | Same prompt | **Pass:** picker in the left pane, not the chat. **Fail:** run hangs, nothing rendered. |
+| `/human-in-the-loop/governed-actions` | An approve/reject card gating a side-effecting tool call (`useHumanInTheLoop`). | "Email carol@northwind.test to confirm her refund of $420 on order NW-8812." | **Pass:** an approval card; approving/rejecting resumes the turn. **Fail:** the agent acts without asking. Verdicts are model-invented (§9). |
 | `/programmatic-control` | `addMessage`, `runAgent`, `stopAgent`, `subscribe` — no chat component. | Press the run button; press stop mid-run. | **Pass:** messages appear and streaming halts on stop. |
 
 ### Shared State
@@ -265,6 +269,10 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Frontend Tools | `/frontend-tools` | ✅ Working | |
 | Human-in-the-Loop | `/human-in-the-loop` | ✅ Working | |
 | Interrupts | `/human-in-the-loop/interrupt-flow` | ✅ Working | `enabled` predicate signature differs from the doc — see §9. |
+| HITL Overview | `/human-in-the-loop/index` | ⚠️ Partial | Code tab verbatim; `hitl-in-chat` now maps to the doc's agent (also used by `/human-in-the-loop`). Not yet checked in a browser. |
+| Pausing the Agent for Input | `/human-in-the-loop/useInterrupt` | ⚠️ Partial | Page excerpts are `@region`s of showcase files used in full (§9). Not yet checked in a browser. |
+| Headless Interrupts | `/human-in-the-loop/headless` | ⚠️ Partial | Showcase demo file; agent shared with useInterrupt. Not yet checked in a browser. |
+| Governed Action Approval UI | `/human-in-the-loop/governed-actions` | ⚠️ Partial | Ported from aws-strands-ts; governance backend unpublished (§9). Not yet checked in a browser. |
 | Programmatic Control | `/programmatic-control` | ✅ Working | |
 | Shared State | `/shared-state` | ✅ Working | `set_notes` written to the contract the page describes in prose. |
 | Render state in your app | `/shared-state/rendering-in-app` | ✅ Working | |
@@ -380,6 +388,9 @@ The same tab also specifies `model: "openai:gpt-5.4"`. That name is reproduced v
 **17. The manual-emission snippet does not await `copilotkitEmitState`.**
 [Predictive state updates](https://docs.copilotkit.ai/langgraph-typescript/shared-state/predictive-state-updates?agent-type=custom-graph&state-emission=manual-emission) writes `copilotkitEmitState(config, state);` inside a loop. The function is an `AsyncFunction`, the SDK's own docstring for it writes `await copilotkitEmitState(config, { progress: i })`, and the Python tab on the same page writes `await copilotkit_emit_state(...)` — only the TypeScript tab drops it. In this specific example it works, because the `setTimeout(…, 1000)` on the next line gives the promise time to settle, but it is a floating promise: a rejection would be unhandled, and nothing orders the emissions against the sleep. Copy that loop into code without the delay and updates can interleave or be lost. `backend/src/agents/predictive-state-updates-manual.ts` reproduces it as published. The snippet is also a fragment — everything around the loop is elided behind `// ...`, so the surrounding node is this repo's.
 
+
+**18. The interrupt pages print excerpts; the runnable files come from the showcase.**
+[Pausing the Agent for Input](https://docs.copilotkit.ai/langgraph-typescript/human-in-the-loop/useInterrupt) prints the `schedule_meeting` tool (no graph assembly) and the `useInterrupt` render, which imports `TimePickerCard`, `generateFallbackSlots` and a suggestions hook it never shows. [Headless Interrupts](https://docs.copilotkit.ai/langgraph-typescript/human-in-the-loop/headless) prints its demo file, which imports the same fallback-slots helper. Those excerpts are the `@region` blocks of CopilotKit showcase files, so `backend/src/agents/interrupt-agent.ts` and `frontend/src/app/human-in-the-loop/_demos/**` are those files, **borrowed whole** (commit a358fa0, labelled), with the doc regions unchanged. The HITL Overview's Code tab is complete except its 190-line showcase `route.ts` (CVDIAG wrappers, `starterAgent` default), which is replaced by this repo's main runtime route. `hitl-in-chat` now runs the doc's agent instead of this repo's builder graph. [Governed Action Approval UI](https://docs.copilotkit.ai/langgraph-typescript/human-in-the-loop/governed-actions) is framework-neutral and ported from aws-strands-ts. It publishes no policy engine, no tool that emits a `GovernedAction`, and no `executeSideEffect`, so the card's verdicts are whatever the model puts in the tool call.
 
 ---
 
@@ -520,6 +531,10 @@ Grouped as the doc sidebar groups them. All 34 tracked pages.
 - [Frontend Tools](https://docs.copilotkit.ai/langgraph-typescript/frontend-tools)
 - [Human-in-the-Loop](https://docs.copilotkit.ai/langgraph-typescript/human-in-the-loop)
 - [Interrupts](https://docs.copilotkit.ai/langgraph-typescript/human-in-the-loop/interrupt-flow)
+- [HITL Overview](https://docs.copilotkit.ai/langgraph-typescript/human-in-the-loop/index)
+- [Pausing the Agent for Input](https://docs.copilotkit.ai/langgraph-typescript/human-in-the-loop/useInterrupt)
+- [Headless Interrupts](https://docs.copilotkit.ai/langgraph-typescript/human-in-the-loop/headless)
+- [Governed Action Approval UI](https://docs.copilotkit.ai/langgraph-typescript/human-in-the-loop/governed-actions)
 - [Sub-Agents](https://docs.copilotkit.ai/langgraph-typescript/multi-agent/subagents)
 - [Agent Config](https://docs.copilotkit.ai/langgraph-typescript/agent-config)
 - [Programmatic Control](https://docs.copilotkit.ai/langgraph-typescript/programmatic-control)

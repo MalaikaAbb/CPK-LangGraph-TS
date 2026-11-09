@@ -83,6 +83,17 @@ export const hitlInChatGraph = buildFrontendToolGraph(
     "than proposing one yourself. Confirm the choice afterwards.",
 );
 
+/**
+ * `/human-in-the-loop/governed-actions` — the page publishes only frontend
+ * code (a `useHumanInTheLoop` approval card); any graph that binds the
+ * forwarded frontend tools serves it. Repo-authored.
+ */
+export const governedActionsGraph = buildFrontendToolGraph(
+  "You are an operations assistant. Before any side-effecting action " +
+    "(refunds, deletions, payments), call the approval tool the app registers " +
+    "and wait for the user's decision; report the outcome afterwards.",
+);
+
 function buildFrontendToolGraph(systemPrompt: string) {
   async function node(state: AgentState, config: RunnableConfig) {
     const model = chatModel({ temperature: 0 });

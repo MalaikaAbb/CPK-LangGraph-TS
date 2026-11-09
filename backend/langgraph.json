@@ -27,7 +27,10 @@
     "declarative-gen-ui": "./src/agents/declarative-gen-ui.ts:graph",
 
     "frontend_tools": "./src/agents/frontend-tools.ts:graph",
-    "hitl-in-chat": "./src/agents/frontend-tools.ts:hitlInChatGraph",
+    "hitl-in-chat": "./src/agents/hitl-in-chat.ts:graph",
+    "governed-actions": "./src/agents/frontend-tools.ts:governedActionsGraph",
+    "gen-ui-interrupt": "./src/agents/interrupt-agent.ts:graph",
+    "interrupt-headless": "./src/agents/interrupt-agent.ts:graph",
     "interrupt-flow": "./src/agents/interrupt-flow.ts:graph",
 
     "shared-state-read-write": "./src/agents/shared-state-read-write.ts:graph",
