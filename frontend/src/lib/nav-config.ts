@@ -314,7 +314,9 @@ export const NAV: NavGroup[] = [
         docPath: "/langgraph-typescript/frontend-tools",
         summary:
           "A tool the agent calls that executes in the browser and changes the page.",
-        status: "working",
+        status: "partial",
+        statusNote:
+          "Main graph verbatim (gpt-6-luna). New no-model graph (/frontend-tools/no-model) and useFrontendTools list demo (/frontend-tools/tool-list) not yet checked in a browser; the list demo's reports/navigate are repo-authored.",
       },
       {
         path: "/human-in-the-loop",
@@ -460,7 +462,9 @@ export const NAV: NavGroup[] = [
         docPath: "/langgraph-typescript/multi-agent/subagents",
         summary:
           "A supervisor delegating to research, writing and critique sub-agents, with a live delegation log.",
-        status: "working",
+        status: "partial",
+        statusNote:
+          "Backend is the page's Code-tab subagents.ts verbatim. Its append-only delegations reducer contradicts the page's own merge-by-id callout, so the log doubles on a continued thread (README §9 item 19).",
       },
       {
         path: "/subgraphs",
@@ -496,8 +500,10 @@ export const NAV: NavGroup[] = [
         title: "Configurable",
         docPath: "/langgraph-typescript/configurable",
         summary:
-          "Per-run execution parameters that ride on config.configurable and never touch agent state.",
-        status: "working",
+          "Server-owned execution settings: the trusted runtime route sets LangGraph context and recursion_limit; the browser sends none.",
+        status: "partial",
+        statusNote:
+          "The page publishes only a graph.invoke(..., { context, recursionLimit }) fragment. Context schema, node and runtime wiring are repo-authored (README §9 item 18). Not yet checked in a browser.",
       },
     ],
   },
