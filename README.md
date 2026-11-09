@@ -177,7 +177,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Route | Demonstrates | Try | Pass / Fail |
 |---|---|---|---|
 | `/custom-look-and-feel/css` | Re-skinning via v2 shadcn tokens and `.copilotKit*` class hooks, scoped to a wrapper. | Send two messages. | **Pass:** warm parchment theme, user bubbles are monospace with a `→` marker. **Fail:** default theme → `theme.css` was not imported by the route. |
-| `/custom-look-and-feel/slots` | Three override levels: class string, props object, whole component. | Look before and after the first message. | **Pass:** custom welcome screen, tinted assistant card with a "slot" badge, tagged disclaimer. **Fail:** default welcome screen → the `welcomeScreen` prop is not landing. |
+| `/custom-look-and-feel/slots` | Three override levels: class string, props object, whole component; plus the `toolCallsView` sub-slot demo at `/custom-look-and-feel/slots/tool-calls-view`. | Look before and after the first message. On the tool-calls demo ask "What's the weather in Tokyo?". | **Pass:** custom welcome screen, tinted assistant card with a "slot" badge, tagged disclaimer; on the tool-calls demo the call is inside a dashed box. **Fail:** default welcome screen → the `welcomeScreen` prop is not landing; no dashed box → `toolCallsView` ignored. |
 | `/custom-look-and-feel/headless-ui` | A chat with no CopilotKit chrome — `useAgent` + `useCopilotKit` only. | Send a message. | **Pass:** hand-rolled bubbles stream. **Fail:** nothing sends → `runAgent` was not called after `addMessage`. |
 | `/custom-look-and-feel/reasoning-messages` | The built-in reasoning card and its `header` / `contentView` sub-slots. | "A bat and ball cost $1.10 in total…" | **Pass:** a card with custom header and monospace content, collapsing to "Thought for N seconds". It arrives in chunks, not per token — streaming is off on this graph by design (§9). **Fail:** no card → the model emitted no reasoning tokens. |
 
@@ -251,7 +251,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | CopilotPopup | `/prebuilt-components/popup` | ✅ Working | |
 | Open, close, and feedback | `/prebuilt-components/chat-controls` | ✅ Working | |
 | CSS Customization | `/custom-look-and-feel/css` | ✅ Working | |
-| Slots | `/custom-look-and-feel/slots` | ✅ Working | Slot override components are this repo's — the doc declares them as stubs. |
+| Slots | `/custom-look-and-feel/slots` | ✅ Working | Slot override components are this repo's — the doc declares them as stubs. `toolCallsView` snippet is verbatim; pointed at `tool-rendering` by a config provider (not yet checked in a browser). |
 | Headless UI | `/custom-look-and-feel/headless-ui` | ✅ Working | |
 | Reasoning Messages | `/custom-look-and-feel/reasoning-messages` | ⚠️ Partial | Needs a reasoning-token model. Defaults to `o4-mini`; override with `OPENAI_REASONING_MODEL`. Token streaming disabled — see §9. |
 | Multimodal Attachments | `/multimodal-attachments` | ✅ Working | |
