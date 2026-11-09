@@ -25,6 +25,8 @@
     "gen-ui-tool-based": "./src/agents/frontend-tools.ts:genUiToolBasedGraph",
     "a2ui-fixed-schema": "./src/agents/a2ui-fixed.ts:graph",
     "declarative-gen-ui": "./src/agents/declarative-gen-ui.ts:graph",
+    "byoc_json_render": "./src/agents/byoc-json-render.ts:graph",
+    "byoc_hashbrown": "./src/agents/byoc-hashbrown.ts:graph",
 
     "frontend_tools": "./src/agents/frontend-tools.ts:graph",
     "hitl-in-chat": "./src/agents/frontend-tools.ts:hitlInChatGraph",

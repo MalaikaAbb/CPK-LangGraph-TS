@@ -301,6 +301,30 @@ export const NAV: NavGroup[] = [
         statusNote:
           "The Book button is inert: the page notes a2ui.render does not yet accept action_handlers.",
       },
+      {
+        path: "/generative-ui/json-render",
+        hasDemo: true,
+        agentId: "byoc_json_render",
+        title: "JSON Render",
+        docPath: "/langgraph-typescript/generative-ui/json-render",
+        summary:
+          "An agent-emitted { root, elements } spec drawn by @json-render/react against a Zod component catalog.",
+        status: "partial",
+        statusNote:
+          "The page's full Code tab, verbatim (own runtime route + own <CopilotKit>). makeChatOpenAI borrowed from the showcase. Type-checks; not yet checked in a browser.",
+      },
+      {
+        path: "/generative-ui/hashbrown",
+        hasDemo: true,
+        agentId: "byoc_hashbrown",
+        title: "Hashbrown",
+        docPath: "/langgraph-typescript/generative-ui/hashbrown",
+        summary:
+          "Streamed structured output parsed progressively by @hashbrownai/react and rendered through a component catalog.",
+        status: "partial",
+        statusNote:
+          "The page's full Code tab, verbatim, on @hashbrownai 0.7.0 exactly. makeChatOpenAI borrowed from the showcase. Type-checks; not yet checked in a browser.",
+      },
     ],
   },
   {
