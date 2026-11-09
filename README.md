@@ -204,6 +204,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Route | Demonstrates | Try | Pass / Fail |
 |---|---|---|---|
 | `/frontend-tools` | A tool that executes in the browser and changes the page. | "Make the background a sunset gradient" | **Pass:** the page background changes. **Fail:** the agent describes a gradient in prose. |
+| `/webmcp` | `useFrontendTool({ name: "searchOrders" })` mirrored to `document.modelContext` for WebMCP browser agents, plus a core-only `CopilotKitCore` registration with no agent (`/webmcp/demo-chat/core-only`). | "Show my open orders" | **Pass:** the agent calls `searchOrders` and lists the stub orders (e.g. A-1001); in Chrome 149+ with WebMCP enabled the status panel shows the tool on `document.modelContext`. **Fail:** the agent answers without calling the tool. |
 | `/human-in-the-loop` | `useHumanInTheLoop` suspending the run behind a picker. | "Book an intro call with sales" | **Pass:** picker renders, nothing streams until you pick, then the confirmation names your slot. **Fail:** the run continues under the picker → `respond` was never called. |
 | `/human-in-the-loop/interrupt-flow` | LangGraph's own `interrupt()`, plus two `useInterrupt` hooks split by `enabled`. | "Hello" | **Pass:** an *ask* card, then an *approval* card, then the reply — using the name you typed. Second message: no cards. **Fail:** immediate reply → the `agentId` on the hook does not match the registered id. |
 | `/programmatic-control` | `addMessage`, `runAgent`, `stopAgent`, `subscribe` — no chat component. | Press the run button; press stop mid-run. | **Pass:** messages appear and streaming halts on stop. |
@@ -263,6 +264,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | A2UI · Dynamic Schema | `/generative-ui/a2ui/dynamic-schema` | ⚠️ Partial | Catalog is the doc's; the leaf UI is this repo's. Most model-sensitive route in the repo — needs `gpt-4o`; one invented component name fails the whole surface. See §9. |
 | A2UI · Fixed Schema | `/generative-ui/a2ui/fixed-schema` | ⚠️ Partial | Book button inert — `a2ui.render` takes no `action_handlers` yet, per the page itself. |
 | Frontend Tools | `/frontend-tools` | ✅ Working | |
+| WebMCP | `/webmcp` | ⚠️ Partial | Ported from aws-strands-ts; snippets verbatim, `searchOrders` is a repo stub (§9). Needs Chrome 149+ for the WebMCP half. Not yet checked in a browser. |
 | Human-in-the-Loop | `/human-in-the-loop` | ✅ Working | |
 | Interrupts | `/human-in-the-loop/interrupt-flow` | ✅ Working | `enabled` predicate signature differs from the doc — see §9. |
 | Programmatic Control | `/programmatic-control` | ✅ Working | |
@@ -380,6 +382,9 @@ The same tab also specifies `model: "openai:gpt-5.4"`. That name is reproduced v
 **17. The manual-emission snippet does not await `copilotkitEmitState`.**
 [Predictive state updates](https://docs.copilotkit.ai/langgraph-typescript/shared-state/predictive-state-updates?agent-type=custom-graph&state-emission=manual-emission) writes `copilotkitEmitState(config, state);` inside a loop. The function is an `AsyncFunction`, the SDK's own docstring for it writes `await copilotkitEmitState(config, { progress: i })`, and the Python tab on the same page writes `await copilotkit_emit_state(...)` — only the TypeScript tab drops it. In this specific example it works, because the `setTimeout(…, 1000)` on the next line gives the promise time to settle, but it is a floating promise: a rejection would be unhandled, and nothing orders the emissions against the sleep. Copy that loop into code without the delay and updates can interleave or be lost. `backend/src/agents/predictive-state-updates-manual.ts` reproduces it as published. The snippet is also a fragment — everything around the loop is elided behind `// ...`, so the surrounding node is this repo's.
 
+
+**18. WebMCP calls a `searchOrders` it never defines.**
+[WebMCP](https://docs.copilotkit.ai/langgraph-typescript/webmcp) publishes two snippets (`OrderSearch.tsx` with `useFrontendTool`, and a core-only `webmcp.ts` using `CopilotKitCore` from `@copilotkit/core`). Both call `searchOrders(status)`, which the page never defines. `frontend/src/app/webmcp/_demo/search-orders.ts` is a repo-authored stub, and the route is ported from the aws-strands-ts harness. The page has no backend code; the `webmcp` graph is this repo's `buildFrontendToolGraph` with a short prompt. `@copilotkit/core` was added as a direct dependency, pinned to 1.80.0 to match `@copilotkit/react-core`. WebMCP itself (`document.modelContext`) only exists in Chrome 149+ behind a flag or origin trial.
 
 ---
 
@@ -518,6 +523,7 @@ Grouped as the doc sidebar groups them. All 34 tracked pages.
 
 **Add Agent Powers**
 - [Frontend Tools](https://docs.copilotkit.ai/langgraph-typescript/frontend-tools)
+- [WebMCP](https://docs.copilotkit.ai/langgraph-typescript/webmcp)
 - [Human-in-the-Loop](https://docs.copilotkit.ai/langgraph-typescript/human-in-the-loop)
 - [Interrupts](https://docs.copilotkit.ai/langgraph-typescript/human-in-the-loop/interrupt-flow)
 - [Sub-Agents](https://docs.copilotkit.ai/langgraph-typescript/multi-agent/subagents)

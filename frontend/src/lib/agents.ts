@@ -45,6 +45,7 @@ export const AGENT_IDS = [
   // App control
   "frontend_tools",
   "hitl-in-chat",
+  "webmcp",
   "interrupt-flow",
   "programmatic-control",
 

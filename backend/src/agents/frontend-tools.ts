@@ -83,6 +83,16 @@ export const hitlInChatGraph = buildFrontendToolGraph(
     "than proposing one yourself. Confirm the choice afterwards.",
 );
 
+/**
+ * `/webmcp` — the page publishes only frontend code (`useFrontendTool` for
+ * `search_orders`, mirrored to `document.modelContext`). Any graph that binds
+ * the forwarded frontend tools serves it; this one is repo-authored.
+ */
+export const webmcpGraph = buildFrontendToolGraph(
+  "You are a helpful assistant. Use the tools the app registers to answer; " +
+    "when the user asks about orders, call `searchOrders`.",
+);
+
 function buildFrontendToolGraph(systemPrompt: string) {
   async function node(state: AgentState, config: RunnableConfig) {
     const model = chatModel({ temperature: 0 });

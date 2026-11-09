@@ -28,6 +28,7 @@
 
     "frontend_tools": "./src/agents/frontend-tools.ts:graph",
     "hitl-in-chat": "./src/agents/frontend-tools.ts:hitlInChatGraph",
+    "webmcp": "./src/agents/frontend-tools.ts:webmcpGraph",
     "interrupt-flow": "./src/agents/interrupt-flow.ts:graph",
 
     "shared-state-read-write": "./src/agents/shared-state-read-write.ts:graph",

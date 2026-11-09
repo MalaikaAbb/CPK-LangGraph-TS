@@ -13,6 +13,7 @@
     "@ag-ui/client": "1.0.3",
     "@ag-ui/core": "1.0.3",
     "@copilotkit/a2ui-renderer": "^1.80.0",
+    "@copilotkit/core": "^1.80.0",
     "@copilotkit/react-core": "^1.80.0",
     "@copilotkit/runtime": "^1.80.0",
     "@copilotkit/voice": "^1.80.0",
