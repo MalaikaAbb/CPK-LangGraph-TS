@@ -234,7 +234,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Route | Demonstrates | Try | Pass / Fail |
 |---|---|---|---|
 | `/agent-config` | A typed config object the UI owns, rebuilt into the system prompt each turn. | Set tone → enthusiastic, expertise → beginner; ask "what is a graph?" | **Pass:** the answer's register and depth change to match. |
-| `/configurable` | Per-run `config.configurable` that never touches agent state. | Press **Run with this config**, change `tenantId`, press again. | **Pass:** the reply reports the values back and the new one after the change; none appear in `agent.state`. **Fail:** "no configuration" → `forwardedProps` must nest as `{ config: { configurable: {...} } }`. |
+| `/configurable` | Server-owned execution settings: the runtime route (trusted server) sets `tenantId` as LangGraph `context` and `recursion_limit: 50`; the browser sends neither. | Ask "What tenant and recursion limit did the server give you?" | **Pass:** reply names `tenant-demo` (or `CONFIGURABLE_TENANT_ID`) and 50. **Fail:** tenant `null` → the key is missing from the graph's context schema, so `@ag-ui/langgraph` does not forward it as context. |
 
 ---
 
@@ -278,7 +278,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Sub-Agents | `/multi-agent/subagents` | ✅ Working | Supervisor node + graph assembly are this repo's; tools and state are the doc's. |
 | Subgraphs | `/subgraphs` | ⚠️ Partial | Page publishes only the frontend snippet, so the parent/child graph is this repo's. |
 | Agent Config | `/agent-config` | ✅ Working | Graph published in full; reproduced. |
-| Configurable | `/configurable` | ✅ Working | |
+| Configurable | `/configurable` | ⚠️ Partial | Page now publishes only a `graph.invoke(..., { context, recursionLimit })` fragment; schema, node and runtime wiring are repo-authored (§9 item 18). Not yet checked in a browser. |
 
 **Totals:** 24 ✅ Working · 10 ⚠️ Partial · 1 ⚪ Reference · 0 ❌ Broken · 0 🚧 Not started.
 
@@ -381,6 +381,9 @@ The same tab also specifies `model: "openai:gpt-5.4"`. That name is reproduced v
 [Predictive state updates](https://docs.copilotkit.ai/langgraph-typescript/shared-state/predictive-state-updates?agent-type=custom-graph&state-emission=manual-emission) writes `copilotkitEmitState(config, state);` inside a loop. The function is an `AsyncFunction`, the SDK's own docstring for it writes `await copilotkitEmitState(config, { progress: i })`, and the Python tab on the same page writes `await copilotkit_emit_state(...)` — only the TypeScript tab drops it. In this specific example it works, because the `setTimeout(…, 1000)` on the next line gives the promise time to settle, but it is a floating promise: a rejection would be unhandled, and nothing orders the emissions against the sleep. Copy that loop into code without the delay and updates can interleave or be lost. `backend/src/agents/predictive-state-updates-manual.ts` reproduces it as published. The snippet is also a fragment — everything around the loop is elided behind `// ...`, so the surrounding node is this repo's.
 
 
+**18. Configurable publishes only an invoke fragment.**
+[Configurable](https://docs.copilotkit.ai/langgraph-typescript/configurable) was rewritten (doc-sync 2026-11-09): it drops the `forwardedProps.config.configurable` example, calls browser-supplied config untrusted, and says execution settings belong to the backend. Its TypeScript tab is three lines — `graph.invoke(input, { context: { tenantId: verifiedTenantId }, recursionLimit: 50 })` — with `graph`, `input` and `verifiedTenantId` undefined, and it defers the context schema and node signature to LangGraph's guide. It also never says how to set these values when the graph is served by a LangGraph server behind `LangGraphAgent`, which is this harness's (and the Quickstart's) setup. The fragment is kept verbatim in `backend/src/agents/configurable.ts` (`doc-snippet` region, wrapped in a function). The context schema, the node, the `assistantConfig` on the runtime route, and `CONFIGURABLE_TENANT_ID` are this repo's. Behaviour relied on: `@ag-ui/langgraph` forwards `configurable` keys the graph's context schema names as LangGraph `context`.
+
 ---
 
 ## 10. Troubleshooting
@@ -397,7 +400,7 @@ Drawn from the Quickstart's own troubleshooting accordion and the failure modes 
 
 **Chat works, the mic returns 401.** `OPENAI_API_KEY` is reaching the LangGraph server but not the Next process. Next only auto-loads `.env` from its own directory — `ln -s ../.env frontend/.env.local` (§5).
 
-**"thread is already processing".** `runAgent` is being called on every render. Move it into an event handler, or a `useEffect` with an empty dependency array. The Configurable page warns about this specifically.
+**"thread is already processing".** `runAgent` is being called on every render. Move it into an event handler, or a `useEffect` with an empty dependency array. (The Configurable page used to warn about this; its 2026-11 rewrite dropped the `runAgent` example.)
 
 **Interrupt cards never appear.** Two causes, both silent. (1) `agentId` on `useInterrupt` must match a runtime-registered agent; omitting it defaults to `"default"` and the interrupt never fires. (2) `event.value` arrives JSON-stringified, so `event.value.type` is `undefined` and every `enabled` predicate returns false — parse it first (§9 item 15). If the backend log shows a `CUSTOM_EVENT` named `on_interrupt`, the graph is fine and the problem is one of these two.
 

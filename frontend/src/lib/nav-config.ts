@@ -496,8 +496,10 @@ export const NAV: NavGroup[] = [
         title: "Configurable",
         docPath: "/langgraph-typescript/configurable",
         summary:
-          "Per-run execution parameters that ride on config.configurable and never touch agent state.",
-        status: "working",
+          "Server-owned execution settings: the trusted runtime route sets LangGraph context and recursion_limit; the browser sends none.",
+        status: "partial",
+        statusNote:
+          "The page publishes only a graph.invoke(..., { context, recursionLimit }) fragment. Context schema, node and runtime wiring are repo-authored (README §9 item 18). Not yet checked in a browser.",
       },
     ],
   },
