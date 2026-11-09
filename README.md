@@ -277,7 +277,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Predictive state updates | `/shared-state/predictive-state-updates` | ⚠️ Partial | Two tabs, one per `agent-type`. Custom graph works. Prebuilt tab is verbatim including `model: "openai:gpt-5.4"`, so it runs only if your key reaches that model — see §9. |
 | Sub-Agents | `/multi-agent/subagents` | ✅ Working | Supervisor node + graph assembly are this repo's; tools and state are the doc's. |
 | Subgraphs | `/subgraphs` | ⚠️ Partial | Page publishes only the frontend snippet, so the parent/child graph is this repo's. |
-| Agent Config | `/agent-config` | ✅ Working | Graph published in full; reproduced. |
+| Agent Config | `/agent-config` | ✅ Working | Graph published in full; reproduced verbatim, including `.toReversed()` (previously rewritten as `.reverse()`) and the inline `gpt-6-luna` model. |
 | Configurable | `/configurable` | ✅ Working | |
 
 **Totals:** 24 ✅ Working · 10 ⚠️ Partial · 1 ⚪ Reference · 0 ❌ Broken · 0 🚧 Not started.
