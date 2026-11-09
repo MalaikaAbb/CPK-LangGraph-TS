@@ -198,6 +198,8 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | `/generative-ui/state-rendering` | Drawing agent state as it arrives. | "Write a short blog post about shared state" | **Pass:** the document pane fills continuously. **Fail:** one burst at the end. |
 | `/generative-ui/a2ui/dynamic-schema` | A secondary LLM designing a surface from your catalog. | "Show me a sales dashboard for Q3" | **Pass:** cards, metric tiles and a chart appear progressively. **Fail:** prose only → the catalog is not reaching the runtime. |
 | `/generative-ui/a2ui/fixed-schema` | A JSON-authored component tree; the tool supplies only data. | "Find me a flight from SFO to JFK" | **Pass:** a flight card with airport codes, airline badge and price. **Fail:** a raw operations blob → the A2UI middleware is not scoped to this agent. The Book button is inert by design (§9). |
+| `/generative-ui/mcp-apps` | An MCP server's UI resource (Excalidraw) rendered inline as a sandboxed iframe via the runtime's `mcpApps.servers`. | "Draw a simple flowchart of a login process in Excalidraw" | **Pass:** an Excalidraw iframe in the chat. **Fail:** text only → MCP tool not called / middleware off; network error → the public server is unreachable. |
+| `/generative-ui/open-generative-ui` | `generateSandboxedUi` streaming agent-written HTML/JS into an iframe; `/generative-ui/open-generative-ui/advanced` adds host-callable sandbox functions. | "Visualize how a neural network forward pass works, animated" | **Pass:** a live visualisation in an iframe. **Fail:** plain text → `openGenerativeUI` not enabled for the agent. |
 
 ### App Control
 
@@ -262,6 +264,8 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | State Rendering | `/generative-ui/state-rendering` | ✅ Working | Shares a graph with State Streaming, as the docs do. |
 | A2UI · Dynamic Schema | `/generative-ui/a2ui/dynamic-schema` | ⚠️ Partial | Catalog is the doc's; the leaf UI is this repo's. Most model-sensitive route in the repo — needs `gpt-4o`; one invented component name fails the whole surface. See §9. |
 | A2UI · Fixed Schema | `/generative-ui/a2ui/fixed-schema` | ⚠️ Partial | Book button inert — `a2ui.render` takes no `action_handlers` yet, per the page itself. |
+| MCP Apps | `/generative-ui/mcp-apps` | ⚠️ Partial | Code tab verbatim; `./chat` + suggestions + `makeChatOpenAI` borrowed from the showcase (§9). Not yet checked in a browser. |
+| Open Generative UI | `/generative-ui/open-generative-ui` | ⚠️ Partial | Code tab verbatim; `./chat`, `./design-skill`, suggestions + `makeChatOpenAI` borrowed from the showcase (§9). Not yet checked in a browser. |
 | Frontend Tools | `/frontend-tools` | ✅ Working | |
 | Human-in-the-Loop | `/human-in-the-loop` | ✅ Working | |
 | Interrupts | `/human-in-the-loop/interrupt-flow` | ✅ Working | `enabled` predicate signature differs from the doc — see §9. |
@@ -380,6 +384,9 @@ The same tab also specifies `model: "openai:gpt-5.4"`. That name is reproduced v
 **17. The manual-emission snippet does not await `copilotkitEmitState`.**
 [Predictive state updates](https://docs.copilotkit.ai/langgraph-typescript/shared-state/predictive-state-updates?agent-type=custom-graph&state-emission=manual-emission) writes `copilotkitEmitState(config, state);` inside a loop. The function is an `AsyncFunction`, the SDK's own docstring for it writes `await copilotkitEmitState(config, { progress: i })`, and the Python tab on the same page writes `await copilotkit_emit_state(...)` — only the TypeScript tab drops it. In this specific example it works, because the `setTimeout(…, 1000)` on the next line gives the promise time to settle, but it is a floating promise: a rejection would be unhandled, and nothing orders the emissions against the sleep. Copy that loop into code without the delay and updates can interleave or be lost. `backend/src/agents/predictive-state-updates-manual.ts` reproduces it as published. The snippet is also a fragment — everything around the loop is elided behind `// ...`, so the surrounding node is this repo's.
 
+
+**18. MCP Apps and Open Generative UI import files their Code tabs never show.**
+[MCP Apps](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/mcp-apps) and [Open Generative UI](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/open-generative-ui) publish complete Code tabs (LangGraph agents, runtime routes, demo pages), but the demo pages import `./chat` (both) and `./design-skill` (OGUI minimal), which are not in the tab, and every agent imports `makeChatOpenAI` (item 2). All of these are **borrowed unchanged from the CopilotKit showcase** (`showcase/integrations/langgraph-typescript/src/app/demos/{mcp-apps,open-gen-ui}/`, commit a358fa0), with a provenance header on each file. The MCP Apps runtime route also registers a `headless_complete` LangGraph agent; this repo's graph of that name is `headless-complete`, so that entry would 404 if used. The route only uses `mcp-apps`, and the entry is kept as published.
 
 ---
 
@@ -515,6 +522,8 @@ Grouped as the doc sidebar groups them. All 34 tracked pages.
 - [State Rendering](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/state-rendering)
 - [A2UI · Dynamic Schema](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/a2ui/dynamic-schema)
 - [A2UI · Fixed Schema](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/a2ui/fixed-schema)
+- [MCP Apps](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/mcp-apps)
+- [Open Generative UI](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/open-generative-ui)
 
 **Add Agent Powers**
 - [Frontend Tools](https://docs.copilotkit.ai/langgraph-typescript/frontend-tools)
