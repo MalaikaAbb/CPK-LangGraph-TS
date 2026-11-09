@@ -236,6 +236,14 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | `/agent-config` | A typed config object the UI owns, rebuilt into the system prompt each turn. | Set tone → enthusiastic, expertise → beginner; ask "what is a graph?" | **Pass:** the answer's register and depth change to match. |
 | `/configurable` | Per-run `config.configurable` that never touches agent state. | Press **Run with this config**, change `tenantId`, press again. | **Pass:** the reply reports the values back and the new one after the change; none appear in `agent.state`. **Fail:** "no configuration" → `forwardedProps` must nest as `{ config: { configurable: {...} } }`. |
 
+### Agent Capabilities
+
+| Route | Demonstrates | Try | Pass / Fail |
+|---|---|---|---|
+| `/guardrails` | Reference only: the page's Python middleware guardrails (PII, input/output/tool firewalls, ordering before `CopilotKitMiddleware`). | Read the verbatim snippets. | **Pass:** all five snippets render. Nothing runs; the page has no TypeScript form (§9 item 18). |
+| `/deploy-agentcore` | Reference: scaffolding and deploying to AWS AgentCore. | Read the commands. | Needs an AWS account; not testable locally. |
+| `/deploy-langsmith` | Reference: `langgraph deploy` plus a `LangGraphAgent` pointed at the deployment. | Optional: deploy `backend/` and set `LANGGRAPH_DEPLOYMENT_URL` + `LANGSMITH_API_KEY`. | **Pass (with an account):** every route answers from the deployment. Not testable locally. |
+
 ---
 
 ## 8. Testing checklist / current status
@@ -279,6 +287,9 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Subgraphs | `/subgraphs` | ⚠️ Partial | Page publishes only the frontend snippet, so the parent/child graph is this repo's. |
 | Agent Config | `/agent-config` | ✅ Working | Graph published in full; reproduced. |
 | Configurable | `/configurable` | ✅ Working | |
+| Guardrails & DLP | `/guardrails` | ❌ Broken | Reference-only: Python-only page, no TypeScript form (§9 item 18). |
+| AWS AgentCore | `/deploy-agentcore` | ⚪ Reference | Requires an AWS account. |
+| LangSmith Platform | `/deploy-langsmith` | ⚪ Reference | Requires a LangSmith deployment; runtime wiring matches this repo's. |
 
 **Totals:** 24 ✅ Working · 10 ⚠️ Partial · 1 ⚪ Reference · 0 ❌ Broken · 0 🚧 Not started.
 
@@ -380,6 +391,9 @@ The same tab also specifies `model: "openai:gpt-5.4"`. That name is reproduced v
 **17. The manual-emission snippet does not await `copilotkitEmitState`.**
 [Predictive state updates](https://docs.copilotkit.ai/langgraph-typescript/shared-state/predictive-state-updates?agent-type=custom-graph&state-emission=manual-emission) writes `copilotkitEmitState(config, state);` inside a loop. The function is an `AsyncFunction`, the SDK's own docstring for it writes `await copilotkitEmitState(config, { progress: i })`, and the Python tab on the same page writes `await copilotkit_emit_state(...)` — only the TypeScript tab drops it. In this specific example it works, because the `setTimeout(…, 1000)` on the next line gives the promise time to settle, but it is a floating promise: a rejection would be unhandled, and nothing orders the emissions against the sleep. Copy that loop into code without the delay and updates can interleave or be lost. `backend/src/agents/predictive-state-updates-manual.ts` reproduces it as published. The snippet is also a fragment — everything around the loop is elided behind `// ...`, so the surrounding node is this repo's.
 
+
+**18. Guardrails & DLP publishes Python only on the TypeScript docs.**
+[Guardrails & DLP](https://docs.copilotkit.ai/langgraph-typescript/guardrails) is listed under Agent capabilities › LangGraph (TypeScript), but every snippet is Python: `create_agent` with `PIIMiddleware`, `AgentMiddleware` subclasses using `before_model` / `wrap_model_call` / `wrap_tool_call`, and the ordering list ahead of `CopilotKitMiddleware()`. It shows no `createMiddleware` / `copilotkitMiddleware` TypeScript equivalent, and no TypeScript sibling harness implements the page (CPK-LangGraph-py has a Python version). The route is therefore reference-only (status Broken), with the published code kept verbatim in `docs-verbatim/guardrails/`. The snippets also call undefined helpers (`screen_input`, `redact_sensitive`, `tool_call_allowed`).
 
 ---
 
@@ -536,3 +550,8 @@ Grouped as the doc sidebar groups them. All 34 tracked pages.
 - [Readables — custom graph](https://docs.copilotkit.ai/langgraph-typescript/agent-app-context?impl=graph) · [prebuilt agent](https://docs.copilotkit.ai/langgraph-typescript/agent-app-context?impl=prebuilt)
 - [Configurable](https://docs.copilotkit.ai/langgraph-typescript/configurable)
 - [Subgraphs](https://docs.copilotkit.ai/langgraph-typescript/subgraphs)
+
+**Agent Capabilities**
+- [Guardrails & DLP](https://docs.copilotkit.ai/langgraph-typescript/guardrails)
+- [AWS AgentCore](https://docs.copilotkit.ai/langgraph-typescript/deploy-agentcore)
+- [LangSmith Platform](https://docs.copilotkit.ai/langgraph-typescript/deploy-langsmith)

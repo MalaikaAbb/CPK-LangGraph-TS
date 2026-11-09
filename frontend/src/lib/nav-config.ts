@@ -477,6 +477,41 @@ export const NAV: NavGroup[] = [
     ],
   },
   {
+    title: "Agent Capabilities",
+    routes: [
+      {
+        path: "/guardrails",
+        title: "Guardrails & DLP",
+        docPath: "/langgraph-typescript/guardrails",
+        summary:
+          "Input, output and tool-call screening as agent middleware, ordered before CopilotKitMiddleware.",
+        status: "broken",
+        statusNote:
+          "Reference-only: the page publishes Python only (AgentMiddleware, PIIMiddleware) and no TypeScript form; this repo's backend is Node. Code kept verbatim in docs-verbatim/guardrails/.",
+      },
+      {
+        path: "/deploy-agentcore",
+        title: "AWS AgentCore",
+        docPath: "/langgraph-typescript/deploy-agentcore",
+        summary:
+          "Scaffolding and deploying a CopilotKit + LangGraph app to AWS Bedrock AgentCore with CDK.",
+        status: "reference",
+        statusNote:
+          "Needs an AWS account (CDK, Cognito) — not testable locally. Commands kept verbatim.",
+      },
+      {
+        path: "/deploy-langsmith",
+        title: "LangSmith Platform",
+        docPath: "/langgraph-typescript/deploy-langsmith",
+        summary:
+          "Deploying a graph to LangSmith and pointing LangGraphAgent at the deployment URL.",
+        status: "reference",
+        statusNote:
+          "Needs a LangSmith deployment — not testable locally. The runtime wiring is the same LangGraphAgent shape every route here already uses.",
+      },
+    ],
+  },
+  {
     title: "Agent Config",
     routes: [
       {
