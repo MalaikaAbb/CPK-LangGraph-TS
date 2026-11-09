@@ -314,7 +314,9 @@ export const NAV: NavGroup[] = [
         docPath: "/langgraph-typescript/frontend-tools",
         summary:
           "A tool the agent calls that executes in the browser and changes the page.",
-        status: "working",
+        status: "partial",
+        statusNote:
+          "Main graph verbatim (gpt-6-luna). New no-model graph (/frontend-tools/no-model) and useFrontendTools list demo (/frontend-tools/tool-list) not yet checked in a browser; the list demo's reports/navigate are repo-authored.",
       },
       {
         path: "/human-in-the-loop",
