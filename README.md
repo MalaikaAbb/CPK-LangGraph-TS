@@ -193,7 +193,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Route | Demonstrates | Try | Pass / Fail |
 |---|---|---|---|
 | `/generative-ui/reasoning` | Replacing the whole card via `messageView.reasoningMessage`. | A multi-step puzzle. | **Pass:** an amber "Reasoning" banner instead of the default card. **Fail:** default card → the slot did not take. |
-| `/generative-ui/tool-based` | `useComponent` registering a React component as a tool. | "Chart Q1–Q4 revenue: 4, 6, 5, 9" | **Pass:** a Recharts bar chart renders inline. **Fail:** a markdown table → the model answered instead of calling the component tool. |
+| `/generative-ui/tool-based` | `useComponent` registering a React component as a tool; `/generative-ui/tool-based/headless` renders the same call in a hand-rolled chat via `CopilotChatToolCallsView`. | "Chart Q1–Q4 revenue: 4, 6, 5, 9" (both demos) | **Pass:** a Recharts bar chart renders inline in both. **Fail:** a markdown table → the model answered instead of calling the component tool; headless reply with no chart → tool calls not rendered. |
 | `/generative-ui/tool-rendering` | A named renderer for `get_weather` plus the `useDefaultRenderTool` wildcard. | "What's the weather in Lisbon?" | **Pass:** a branded weather card, not raw JSON. **Fail:** raw JSON → the renderer `name` does not match the backend tool name. |
 | `/generative-ui/state-rendering` | Drawing agent state as it arrives. | "Write a short blog post about shared state" | **Pass:** the document pane fills continuously. **Fail:** one burst at the end. |
 | `/generative-ui/a2ui/dynamic-schema` | A secondary LLM designing a surface from your catalog. | "Show me a sales dashboard for Q3" | **Pass:** cards, metric tiles and a chart appear progressively. **Fail:** prose only → the catalog is not reaching the runtime. |
@@ -257,7 +257,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Multimodal Attachments | `/multimodal-attachments` | ✅ Working | |
 | Voice | `/voice` | ⚠️ Partial | Mic needs `OPENAI_API_KEY` in the Next process. Without it the sample-audio button still drives the route. |
 | Reasoning | `/generative-ui/reasoning` | ⚠️ Partial | Same reasoning-model dependency and disabled token streaming. |
-| Components as Tools | `/generative-ui/tool-based` | ✅ Working | |
+| Components as Tools | `/generative-ui/tool-based` | ✅ Working | Headless-chat demo is new, not yet checked in a browser. The page's shared `frontend-tools.ts` / no-model graph changes are carried by the Frontend Tools PR. |
 | Tool Call Rendering | `/generative-ui/tool-rendering` | ⚠️ Partial | `get_weather` only — the sole backend tool the page defines. See §9. |
 | State Rendering | `/generative-ui/state-rendering` | ✅ Working | Shares a graph with State Streaming, as the docs do. |
 | A2UI · Dynamic Schema | `/generative-ui/a2ui/dynamic-schema` | ⚠️ Partial | Catalog is the doc's; the leaf UI is this repo's. Most model-sensitive route in the repo — needs `gpt-4o`; one invented component name fails the whole surface. See §9. |

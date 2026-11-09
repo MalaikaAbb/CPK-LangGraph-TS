@@ -47,6 +47,27 @@ export default function Page() {
         <SourceCode file="frontend/src/app/generative-ui/tool-based/demo-chat/page.tsx" />
       </Panel>
 
+      <Panel
+        title="Rendering in a headless chat"
+        description="A hand-rolled message list paints nothing until it renders the tool calls itself."
+      >
+        <p className="mb-3 text-sm text-slate-700 dark:text-slate-300">
+          Open{" "}
+          <a
+            href="/generative-ui/tool-based/headless"
+            className="text-[var(--accent)] underline underline-offset-4"
+          >
+            the headless demo
+          </a>{" "}
+          and ask for a bar chart of three numbers. Pass: the chart renders
+          under the assistant turn. Fail: the agent replies but no chart
+          appears, which means the tool call is not being rendered. The page
+          publishes only the <code>CopilotChatToolCallsView</code> line; the
+          surrounding list and composer are this repo&apos;s.
+        </p>
+        <SourceCode file="frontend/src/app/generative-ui/tool-based/headless/page.tsx" region="doc" />
+      </Panel>
+
       <Callout tone="info" title="Name it like a verb">
         <p>
           The <code>name</code> passed to <code>useComponent</code> is what the
