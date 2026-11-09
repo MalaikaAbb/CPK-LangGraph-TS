@@ -50,6 +50,7 @@ async function runChatNode(
   const appContext = state.copilotkit?.context;
   const isEmptyContext =
     !appContext ||
+    // @ts-expect-error doc bug (README §9 item 18): copilotkit.context is typed as an array, so the string branch narrows to never
     (typeof appContext === "string" && appContext.trim() === "") ||
     (typeof appContext === "object" && Object.keys(appContext).length === 0);
 

@@ -381,6 +381,9 @@ The same tab also specifies `model: "openai:gpt-5.4"`. That name is reproduced v
 [Predictive state updates](https://docs.copilotkit.ai/langgraph-typescript/shared-state/predictive-state-updates?agent-type=custom-graph&state-emission=manual-emission) writes `copilotkitEmitState(config, state);` inside a loop. The function is an `AsyncFunction`, the SDK's own docstring for it writes `await copilotkitEmitState(config, { progress: i })`, and the Python tab on the same page writes `await copilotkit_emit_state(...)` — only the TypeScript tab drops it. In this specific example it works, because the `setTimeout(…, 1000)` on the next line gives the promise time to settle, but it is a floating promise: a rejection would be unhandled, and nothing orders the emissions against the sleep. Copy that loop into code without the delay and updates can interleave or be lost. `backend/src/agents/predictive-state-updates-manual.ts` reproduces it as published. The snippet is also a fragment — everything around the loop is elided behind `// ...`, so the surrounding node is this repo's.
 
 
+**18. Agent Read-Only Context's chat node type-checks a string branch that can't happen.**
+[Agent Read-Only Context](https://docs.copilotkit.ai/langgraph-typescript/shared-state/agent-readonly) tests `typeof appContext === "string" && appContext.trim() === ""`, but `state.copilotkit.context` is typed as an array of `{ description, value }` entries, so under `strict` the string branch narrows to `never` and `.trim()` is a type error (TS2339). It is harmless at runtime (the branch never runs), and `backend/src/agents/readonly-state-agent-context.ts` keeps it verbatim behind a `@ts-expect-error`. The same Code-tab file exports a `chatNode` built on the public `ChatOpenAI` constructor but wires the graph to a `chatNodeWithHeaders` that uses the unpublished `makeChatOpenAI` (item 2), so the node the page shows is not the one that runs.
+
 ---
 
 ## 10. Troubleshooting
