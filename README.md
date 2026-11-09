@@ -179,6 +179,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | `/custom-look-and-feel/css` | Re-skinning via v2 shadcn tokens and `.copilotKit*` class hooks, scoped to a wrapper. | Send two messages. | **Pass:** warm parchment theme, user bubbles are monospace with a `→` marker. **Fail:** default theme → `theme.css` was not imported by the route. |
 | `/custom-look-and-feel/slots` | Three override levels: class string, props object, whole component. | Look before and after the first message. | **Pass:** custom welcome screen, tinted assistant card with a "slot" badge, tagged disclaimer. **Fail:** default welcome screen → the `welcomeScreen` prop is not landing. |
 | `/custom-look-and-feel/headless-ui` | A chat with no CopilotKit chrome — `useAgent` + `useCopilotKit` only. | Send a message. | **Pass:** hand-rolled bubbles stream. **Fail:** nothing sends → `runAgent` was not called after `addMessage`. |
+| `/custom-look-and-feel/markdown` | The `markdownRenderer` slot as a Streamdown components map, a class string, and a replacement component (one tab each). | "Reply with a level-2 markdown heading, then a paragraph containing a markdown link to https://copilotkit.ai" | **Pass:** components tab — `<h2 class="my-heading">` / `<a class="my-link">` in DevTools (no visible style; the page defines no CSS); class tab — smaller text with `text-sm leading-7`; PlainText tab — raw markdown in a `<pre>`. **Fail:** `data-streamdown` still on the anchor → the object form never reached Streamdown. |
 | `/custom-look-and-feel/reasoning-messages` | The built-in reasoning card and its `header` / `contentView` sub-slots. | "A bat and ball cost $1.10 in total…" | **Pass:** a card with custom header and monospace content, collapsing to "Thought for N seconds". It arrives in chunks, not per token — streaming is off on this graph by design (§9). **Fail:** no card → the model emitted no reasoning tokens. |
 
 ### Input Modalities
@@ -253,6 +254,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | CSS Customization | `/custom-look-and-feel/css` | ✅ Working | |
 | Slots | `/custom-look-and-feel/slots` | ✅ Working | Slot override components are this repo's — the doc declares them as stubs. |
 | Headless UI | `/custom-look-and-feel/headless-ui` | ✅ Working | |
+| Markdown Rendering | `/custom-look-and-feel/markdown` | ⚠️ Partial | Snippets verbatim; route ported from aws-strands-ts. First example only visible in DevTools (no CSS for its classes). Not yet checked in a browser. |
 | Reasoning Messages | `/custom-look-and-feel/reasoning-messages` | ⚠️ Partial | Needs a reasoning-token model. Defaults to `o4-mini`; override with `OPENAI_REASONING_MODEL`. Token streaming disabled — see §9. |
 | Multimodal Attachments | `/multimodal-attachments` | ✅ Working | |
 | Voice | `/voice` | ⚠️ Partial | Mic needs `OPENAI_API_KEY` in the Next process. Without it the sample-audio button still drives the route. |
@@ -504,6 +506,7 @@ Grouped as the doc sidebar groups them. All 34 tracked pages.
 - [CSS Customization](https://docs.copilotkit.ai/langgraph-typescript/custom-look-and-feel/css)
 - [Slots](https://docs.copilotkit.ai/langgraph-typescript/custom-look-and-feel/slots)
 - [Headless UI](https://docs.copilotkit.ai/langgraph-typescript/custom-look-and-feel/headless-ui)
+- [Markdown Rendering](https://docs.copilotkit.ai/langgraph-typescript/custom-look-and-feel/markdown)
 - [Reasoning Messages](https://docs.copilotkit.ai/langgraph-typescript/custom-look-and-feel/reasoning-messages)
 - [Multimodal Attachments](https://docs.copilotkit.ai/langgraph-typescript/multimodal-attachments)
 - [Voice](https://docs.copilotkit.ai/langgraph-typescript/voice)

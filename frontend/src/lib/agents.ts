@@ -27,6 +27,7 @@ export const AGENT_IDS = [
   // Custom look and feel
   "chat-customization-css",
   "chat-slots",
+  "chat-markdown",
   "headless-simple",
   "headless-complete",
   "reasoning-default",
