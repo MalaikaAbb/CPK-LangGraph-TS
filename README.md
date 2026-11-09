@@ -196,6 +196,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | `/generative-ui/tool-based` | `useComponent` registering a React component as a tool. | "Chart Q1–Q4 revenue: 4, 6, 5, 9" | **Pass:** a Recharts bar chart renders inline. **Fail:** a markdown table → the model answered instead of calling the component tool. |
 | `/generative-ui/tool-rendering` | A named renderer for `get_weather` plus the `useDefaultRenderTool` wildcard. | "What's the weather in Lisbon?" | **Pass:** a branded weather card, not raw JSON. **Fail:** raw JSON → the renderer `name` does not match the backend tool name. |
 | `/generative-ui/state-rendering` | Drawing agent state as it arrives. | "Write a short blog post about shared state" | **Pass:** the document pane fills continuously. **Fail:** one burst at the end. |
+| `/generative-ui/a2ui` | Overview: the three A2UI operations, the two approaches, the two ways to switch A2UI on, and the surface color variables, mapped onto this repo's two A2UI routes. | Read; follow the links to Dynamic / Fixed Schema. | Reference page; nothing runs on it. |
 | `/generative-ui/a2ui/dynamic-schema` | A secondary LLM designing a surface from your catalog. | "Show me a sales dashboard for Q3" | **Pass:** cards, metric tiles and a chart appear progressively. **Fail:** prose only → the catalog is not reaching the runtime. |
 | `/generative-ui/a2ui/fixed-schema` | A JSON-authored component tree; the tool supplies only data. | "Find me a flight from SFO to JFK" | **Pass:** a flight card with airport codes, airline badge and price. **Fail:** a raw operations blob → the A2UI middleware is not scoped to this agent. The Book button is inert by design (§9). |
 
@@ -260,6 +261,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Components as Tools | `/generative-ui/tool-based` | ✅ Working | |
 | Tool Call Rendering | `/generative-ui/tool-rendering` | ⚠️ Partial | `get_weather` only — the sole backend tool the page defines. See §9. |
 | State Rendering | `/generative-ui/state-rendering` | ✅ Working | Shares a graph with State Streaming, as the docs do. |
+| A2UI | `/generative-ui/a2ui` | ⚪ Reference | Overview. Setup paths run on the Dynamic/Fixed Schema routes; no-catalog `injectA2UITool: true` and the CSS variables are shown, not run. |
 | A2UI · Dynamic Schema | `/generative-ui/a2ui/dynamic-schema` | ⚠️ Partial | Catalog is the doc's; the leaf UI is this repo's. Most model-sensitive route in the repo — needs `gpt-4o`; one invented component name fails the whole surface. See §9. |
 | A2UI · Fixed Schema | `/generative-ui/a2ui/fixed-schema` | ⚠️ Partial | Book button inert — `a2ui.render` takes no `action_handlers` yet, per the page itself. |
 | Frontend Tools | `/frontend-tools` | ✅ Working | |
@@ -513,6 +515,7 @@ Grouped as the doc sidebar groups them. All 34 tracked pages.
 - [Components as Tools](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/tool-based)
 - [Tool Call Rendering](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/tool-rendering)
 - [State Rendering](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/state-rendering)
+- [A2UI](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/a2ui)
 - [A2UI · Dynamic Schema](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/a2ui/dynamic-schema)
 - [A2UI · Fixed Schema](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/a2ui/fixed-schema)
 
