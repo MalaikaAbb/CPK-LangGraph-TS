@@ -245,7 +245,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Doc page | Route | Status | Notes |
 |---|---|---|---|
 | Introduction | `/` | ⚪ Reference | Landing page — orientation and live graph roster. |
-| Quickstart | `/quickstart` | ✅ Working | Doc's bring-your-own tab is Python even here; this is that one-node graph in TypeScript. |
+| Quickstart | `/quickstart` | ✅ Working | Graph is the page's new TypeScript `src/agent.ts` verbatim (model `gpt-6-luna`, no checkpointer). Intelligence key is now `CPK_INTELLIGENCE_API_KEY` (old name still read). |
 | CopilotChat | `/prebuilt-components/chat` | ✅ Working | |
 | CopilotSidebar | `/prebuilt-components/sidebar` | ✅ Working | |
 | CopilotPopup | `/prebuilt-components/popup` | ✅ Working | |
@@ -380,6 +380,9 @@ The same tab also specifies `model: "openai:gpt-5.4"`. That name is reproduced v
 **17. The manual-emission snippet does not await `copilotkitEmitState`.**
 [Predictive state updates](https://docs.copilotkit.ai/langgraph-typescript/shared-state/predictive-state-updates?agent-type=custom-graph&state-emission=manual-emission) writes `copilotkitEmitState(config, state);` inside a loop. The function is an `AsyncFunction`, the SDK's own docstring for it writes `await copilotkitEmitState(config, { progress: i })`, and the Python tab on the same page writes `await copilotkit_emit_state(...)` — only the TypeScript tab drops it. In this specific example it works, because the `setTimeout(…, 1000)` on the next line gives the promise time to settle, but it is a floating promise: a rejection would be unhandled, and nothing orders the emissions against the sleep. Copy that loop into code without the delay and updates can interleave or be lost. `backend/src/agents/predictive-state-updates-manual.ts` reproduces it as published. The snippet is also a fragment — everything around the loop is elided behind `// ...`, so the surrounding node is this repo's.
 
+
+**18. The Quickstart's TypeScript agent hard-codes `gpt-6-luna`, and its Intelligence key was renamed.**
+[Quickstart](https://docs.copilotkit.ai/langgraph-typescript/quickstart) now has a TypeScript tab (doc-sync 2026-11-09). Its `src/agent.ts` builds `new ChatOpenAI({ modelKwargs: { reasoning_effort: "none" }, model: "gpt-6-luna" })` inline rather than reading a model setting, so `backend/src/agents/quickstart.ts` (verbatim) only answers if your key reaches that model; `OPENAI_MODEL` does not affect it. The runtime snippet now reads `CPK_INTELLIGENCE_API_KEY` (written by `npx copilotkit@latest project select`) instead of `INTELLIGENCE_API_KEY`; `frontend/src/lib/copilot-runtime.ts` reads the new name first and falls back to the old one. The page's FastAPI tab switched from `LangGraphHttpAgent` to `HttpAgent` from `@ag-ui/client`; that tab is Python-only and not exercised here.
 
 ---
 
