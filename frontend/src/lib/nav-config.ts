@@ -265,7 +265,7 @@ export const NAV: NavGroup[] = [
           "A named renderer for the get_weather tool, plus the wildcard catch-all from useDefaultRenderTool.",
         status: "partial",
         statusNote:
-          "get_weather only — it is the sole backend tool the page actually defines. search_flights, get_stock_price and roll_dice appear only as renderer props.",
+          "Backend is the page's Code-tab agent with all four tools (get_weather, search_flights, get_stock_price, roll_d20); only get_weather has a named renderer, the rest go through the catch-all. Grouping controls (toolCallDisplay, group: true) not yet checked in a browser.",
       },
       {
         path: "/generative-ui/state-rendering",
