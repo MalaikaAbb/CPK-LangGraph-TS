@@ -254,7 +254,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Slots | `/custom-look-and-feel/slots` | ✅ Working | Slot override components are this repo's — the doc declares them as stubs. `toolCallsView` snippet is verbatim; pointed at `tool-rendering` by a config provider (not yet checked in a browser). |
 | Headless UI | `/custom-look-and-feel/headless-ui` | ✅ Working | |
 | Reasoning Messages | `/custom-look-and-feel/reasoning-messages` | ⚠️ Partial | Needs a reasoning-token model. Defaults to `o4-mini`; override with `OPENAI_REASONING_MODEL`. Token streaming disabled — see §9. |
-| Multimodal Attachments | `/multimodal-attachments` | ✅ Working | `maxConcurrentUploads` (new on the page) is not in 1.80 and is ignored — §9 item 19. |
+| Multimodal Attachments | `/multimodal-attachments` | ✅ Working | Sets the new `maxConcurrentUploads: 3`; the page's `uploadToStorage` helper is undefined and not copied (§9 item 19). |
 | Voice | `/voice` | ⚠️ Partial | Mic needs `OPENAI_API_KEY` in the Next process. Without it the sample-audio button still drives the route. |
 | Reasoning | `/generative-ui/reasoning` | ⚠️ Partial | Same reasoning-model dependency and disabled token streaming. |
 | Components as Tools | `/generative-ui/tool-based` | ✅ Working | |
@@ -384,8 +384,8 @@ The same tab also specifies `model: "openai:gpt-5.4"`. That name is reproduced v
 **18. Frontend Tools' `useFrontendTools` example is a fragment.**
 [Frontend Tools](https://docs.copilotkit.ai/langgraph-typescript/frontend-tools#registering-a-list-of-tools) added a "Registering a list of tools" section whose snippet maps over `reports` and calls `navigate`, neither of which is defined. `frontend/src/app/frontend-tools/tool-list/page.tsx` keeps the call verbatim and supplies both (a toggleable report list and a `navigate` that records the path). The same page's new no-model graph is complete and runs as published (`backend/src/agents/frontend-tools-no-model.ts`), and its main graph now hard-codes `model: "gpt-6-luna"` with `reasoning_effort: "none"`, kept as published.
 
-**19. `maxConcurrentUploads` is documented ahead of the installed package.**
-[Multimodal Attachments](https://docs.copilotkit.ai/langgraph-typescript/multimodal-attachments#upload-concurrency) added `attachments.maxConcurrentUploads` (default `1`). `@copilotkit/react-core` 1.80.0, which this repo pins, has no such field on `AttachmentsConfig`, so `frontend/src/app/multimodal-attachments/demo-chat/page.tsx` sets `maxConcurrentUploads: 3` behind a `@ts-expect-error` and uploads still run one at a time. The page's snippet also calls an undefined `uploadToStorage`; that line is not copied, since the demo tests the default inline upload. Re-check after a CopilotKit bump: the suppression then fails `tsc` and should be removed.
+**19. Multimodal Attachments' upload-concurrency snippet calls an undefined helper.**
+[Multimodal Attachments](https://docs.copilotkit.ai/langgraph-typescript/multimodal-attachments#upload-concurrency) added `attachments.maxConcurrentUploads` (default `1`); it type-checks and is implemented in the pinned `@copilotkit/react-core` 1.80.0, and `frontend/src/app/multimodal-attachments/demo-chat/page.tsx` now sets it to `3` as published. The same snippet's `onUpload: async (file) => uploadToStorage(file)` uses a `uploadToStorage` the page never defines; that line is not copied, since the demo tests the default inline upload.
 
 ---
 
