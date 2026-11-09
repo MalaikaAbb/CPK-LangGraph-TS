@@ -389,7 +389,9 @@ export const NAV: NavGroup[] = [
         docPath: "/langgraph-typescript/shared-state/agent-readonly",
         summary:
           "useAgentContext as a one-way UI-to-agent channel — props for the agent, with no setter.",
-        status: "working",
+        status: "partial",
+        statusNote:
+          "Backend graph was missing from langgraph.json; now the page's Code-tab agent verbatim (gpt-6-luna via makeChatOpenAI, borrowed from the showcase). Not yet checked in a browser.",
       },
       {
         path: "/agent-app-context",

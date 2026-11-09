@@ -269,7 +269,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Shared State | `/shared-state` | ✅ Working | `set_notes` written to the contract the page describes in prose. |
 | Render state in your app | `/shared-state/rendering-in-app` | ✅ Working | |
 | State Streaming | `/shared-state/streaming` | ✅ Working | |
-| Agent Read-Only Context | `/shared-state/agent-readonly` | ✅ Working | |
+| Agent Read-Only Context | `/shared-state/agent-readonly` | ⚠️ Partial | Graph was missing from `langgraph.json` on `main` (route would 404); now the page's Code-tab agent verbatim (`gpt-6-luna` via borrowed `makeChatOpenAI`). Not yet checked in a browser. |
 | Readables | `/agent-app-context` | ⚠️ Partial | Covers `impl=graph`. `impl=prebuilt` (`createAgent` + `copilotkitMiddleware`) documented, not run. |
 | Reading agent state | `/shared-state/in-app-agent-read` | ✅ Working | |
 | Writing agent state | `/shared-state/in-app-agent-write` | ✅ Working | |
@@ -460,7 +460,9 @@ langgraph-typescript/
 │       ├── shared-state-*.ts    # read-write, streaming, language
 │       ├── state-inputs-outputs.ts
 │       ├── predictive-state-updates.ts
-│       ├── readonly-state.ts    # agent-readonly + agent-app-context
+│       ├── readonly-state.ts    # agent-app-context (Readables)
+│       ├── readonly-state-agent-context.ts  # agent-readonly (Code-tab file)
+│       ├── openai-headers.ts    # makeChatOpenAI, borrowed from the showcase
 │       ├── interrupt-flow.ts    # LangGraph interrupt()
 │       ├── subagents.ts         # supervisor + 3 delegation tools
 │       ├── subgraphs.ts         # a compiled graph as a node
