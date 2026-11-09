@@ -15,7 +15,7 @@
     "headless-simple": "./src/agents/chat-agents.ts:headlessSimpleGraph",
     "headless-complete": "./src/agents/chat-agents.ts:headlessCompleteGraph",
     "reasoning-default": "./src/agents/chat-agents.ts:reasoningDefaultGraph",
-    "reasoning-custom": "./src/agents/chat-agents.ts:reasoningCustomGraph",
+    "reasoning-custom": "./src/agents/reasoning-agent.ts:reasoningCustomGraph",
 
     "multimodal": "./src/agents/chat-agents.ts:multimodalGraph",
     "voice-demo": "./src/agents/chat-agents.ts:voiceDemoGraph",
