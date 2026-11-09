@@ -275,7 +275,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Writing agent state | `/shared-state/in-app-agent-write` | ✅ Working | |
 | Input/Output Schemas | `/shared-state/state-inputs-outputs` | ⚠️ Partial | Doc declares `resources` but never writes or reads it — the internal-state half is this repo's. See §9. |
 | Predictive state updates | `/shared-state/predictive-state-updates` | ⚠️ Partial | Two tabs, one per `agent-type`. Custom graph works. Prebuilt tab is verbatim including `model: "openai:gpt-5.4"`, so it runs only if your key reaches that model — see §9. |
-| Sub-Agents | `/multi-agent/subagents` | ✅ Working | Supervisor node + graph assembly are this repo's; tools and state are the doc's. |
+| Sub-Agents | `/multi-agent/subagents` | ⚠️ Partial | Backend is the page's Code-tab `subagents.ts` verbatim (model `gpt-6-luna`), minus the unpublished `openai-headers` `showcaseGraph`. Delegation log doubles on a continued thread (§9 item 19). |
 | Subgraphs | `/subgraphs` | ⚠️ Partial | Page publishes only the frontend snippet, so the parent/child graph is this repo's. |
 | Agent Config | `/agent-config` | ✅ Working | Graph published in full; reproduced. |
 | Configurable | `/configurable` | ⚠️ Partial | Page now publishes only a `graph.invoke(..., { context, recursionLimit })` fragment; schema, node and runtime wiring are repo-authored (§9 item 18). Not yet checked in a browser. |
@@ -383,6 +383,9 @@ The same tab also specifies `model: "openai:gpt-5.4"`. That name is reproduced v
 
 **18. Configurable publishes only an invoke fragment.**
 [Configurable](https://docs.copilotkit.ai/langgraph-typescript/configurable) was rewritten (doc-sync 2026-11-09): it drops the `forwardedProps.config.configurable` example, calls browser-supplied config untrusted, and says execution settings belong to the backend. Its TypeScript tab is three lines — `graph.invoke(input, { context: { tenantId: verifiedTenantId }, recursionLimit: 50 })` — with `graph`, `input` and `verifiedTenantId` undefined, and it defers the context schema and node signature to LangGraph's guide. It also never says how to set these values when the graph is served by a LangGraph server behind `LangGraphAgent`, which is this harness's (and the Quickstart's) setup. The fragment is kept verbatim in `backend/src/agents/configurable.ts` (`doc-snippet` region, wrapped in a function). The context schema, the node, the `assistantConfig` on the runtime route, and `CONFIGURABLE_TENANT_ID` are this repo's. Behaviour relied on: `@ag-ui/langgraph` forwards `configurable` keys the graph's context schema names as LangGraph `context`.
+
+**19. Sub-Agents warns against append-only reducers, then uses one.**
+[Sub-Agents](https://docs.copilotkit.ai/langgraph-typescript/multi-agent/subagents) gained a callout (doc-sync 2026-11-09): give every delegation a stable `id` and merge by it, because the client echoes shared state back as run input and a blindly appending reducer doubles the log on a continued thread. The page's own `subagents.ts` still declares `delegations` with `reducer: (a, b) => [...(a ?? []), ...(b ?? [])]`. `backend/src/agents/subagents.ts` keeps that reducer as published, so expect duplicate log entries after the second message in a thread. The same file now builds its models through an inline `defaultModelFactory` (`new ChatOpenAI({ temperature: 0, model: "gpt-6-luna", modelKwargs: { reasoning_effort: "none" } })`), kept verbatim, so the route needs a key that reaches `gpt-6-luna`. The page's Code tab also exports a `showcaseGraph` built on the unpublished `makeChatOpenAI` (item 2); that export and its import are commented out.
 
 ---
 

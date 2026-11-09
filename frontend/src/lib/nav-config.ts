@@ -460,7 +460,9 @@ export const NAV: NavGroup[] = [
         docPath: "/langgraph-typescript/multi-agent/subagents",
         summary:
           "A supervisor delegating to research, writing and critique sub-agents, with a live delegation log.",
-        status: "working",
+        status: "partial",
+        statusNote:
+          "Backend is the page's Code-tab subagents.ts verbatim. Its append-only delegations reducer contradicts the page's own merge-by-id callout, so the log doubles on a continued thread (README §9 item 19).",
       },
       {
         path: "/subgraphs",
