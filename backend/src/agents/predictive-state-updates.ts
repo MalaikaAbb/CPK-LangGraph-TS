@@ -1,6 +1,7 @@
 /**
  * `/shared-state/predictive-state-updates` — the graph the page publishes in
- * full, unchanged apart from the model construction (README §9).
+ * full and unchanged, including its `gpt-6-luna` model literal (doc-sync
+ * 2026-11-09).
  *
  * A LangGraph agent's state only changes across node transitions, so a single
  * long node looks like a spinner. `StepProgressTool` + the
@@ -36,7 +37,6 @@ import {
   CopilotKitStateAnnotation,
 } from "@copilotkit/sdk-js/langgraph";
 
-import { DEFAULT_MODEL } from "./model.js";
 
 //#region agent
 // 1. Define shared state with CopilotKit annotations
@@ -87,8 +87,8 @@ const tools = [stepProgressTool];
 // 3. Define the chat node
 async function chatNode(state: AgentState, config: RunnableConfig) {
   const model = new ChatOpenAI({
-    model: DEFAULT_MODEL,
-    modelKwargs: { parallel_tool_calls: false },
+    model: "gpt-6-luna",
+    modelKwargs: { parallel_tool_calls: false, reasoning_effort: "none" },
   });
 
   const modelWithTools = model.bindTools!([
