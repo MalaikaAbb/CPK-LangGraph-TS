@@ -54,8 +54,6 @@ import {
   Annotation,
 } from "@langchain/langgraph";
 import { ChatOpenAI } from "@langchain/openai";
-import { makeChatOpenAI } from "./openai-headers";
-
 import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langgraph";
 
 type Tone = "professional" | "casual" | "enthusiastic";
@@ -182,11 +180,11 @@ function buildSystemPrompt(props: ResolvedProps): string {
   ].join("\n");
 }
 
-async function chatNode(state: AgentState, config: RunnableConfig) {
-  const model = makeChatOpenAI(config, {
-    model: "gpt-4o-mini",
-    temperature: 0.4,
-  });
+async function runChatNode(
+  state: AgentState,
+  config: RunnableConfig,
+  model: ChatOpenAI,
+) {
   const props = readConfig(state, config);
   const systemPrompt = buildSystemPrompt(props);
 
@@ -198,14 +196,27 @@ async function chatNode(state: AgentState, config: RunnableConfig) {
   return { messages: response };
 }
 
-const workflow = new StateGraph(AgentStateAnnotation)
-  .addNode("chat_node", chatNode)
-  .addEdge(START, "chat_node")
-  .addEdge("chat_node", "__end__");
+async function chatNode(state: AgentState, config: RunnableConfig) {
+  return runChatNode(
+    state,
+    config,
+    new ChatOpenAI({
+      modelKwargs: { reasoning_effort: "none" },
+      model: "gpt-6-luna",
+      temperature: 0.4,
+    }),
+  );
+}
 
-const memory = new MemorySaver();
+function compileGraph(node: typeof chatNode) {
+  return new StateGraph(AgentStateAnnotation)
+    .addNode("chat_node", node)
+    .addEdge(START, "chat_node")
+    .addEdge("chat_node", "__end__")
+    .compile({ checkpointer: new MemorySaver() });
+}
 
-export const graph = workflow.compile({ checkpointer: memory });
+export const graph = compileGraph(chatNode);
 ~~~~
 
 
@@ -237,41 +248,14 @@ function ConfigContextRelay({ config }: { config: AgentConfig }) {
 
 
 
-The backend half is also a single node. Read the latest config context at the top of every run and use it to build the system prompt for that turn:
+The framework setup above shows the exact backend bridge for the selected
+agent. In every framework, the flow is the same: read the latest valid context
+from the current run and use it to build the system prompt for that turn.
 
-```python title="backend/agent.py — agent reads config and rebuilds the system prompt"
-import json
-
-CONFIG_KEYS = ("tone", "expertise", "responseLength")
-
-def read_config_value(entry):
-    value = entry.get("value")
-    if isinstance(value, str):
-        try:
-            value = json.loads(value)
-        except json.JSONDecodeError:
-            return None
-    if not isinstance(value, dict):
-        return None
-    if any(key in value for key in CONFIG_KEYS):
-        return value
-    return None
-
-async def my_agent_node(state: AgentState, config: RunnableConfig):
-    context_entries = state.get("copilotkit", {}).get("context", [])
-    cfg = next(
-        (
-            value
-            for entry in reversed(context_entries)
-            if (value := read_config_value(entry)) is not None
-        ),
-        {},
-    )
-    tone = cfg.get("tone", "professional")
-    expertise = cfg.get("expertise", "intermediate")
-    response_length = cfg.get("responseLength", "concise")
-    system_prompt = build_system_prompt(tone, expertise, response_length)
-    # ...
+```text title="Backend flow"
+config = latestValidConfig(currentRun.context)
+systemPrompt = buildSystemPrompt(config)
+model.invoke(systemPrompt, currentUserRequest)
 ```
 
 The agent reads the latest typed config at the start of every turn, rebuilds the system prompt, runs the turn. This is the same shape as the [shared-state write-side pattern](/langgraph-typescript/shared-state#writing-to-agent-state); agent config is just a specific use of that pattern with a UI-owned typed object on top.
