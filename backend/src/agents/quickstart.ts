@@ -1,51 +1,36 @@
 /**
- * `/quickstart` — the smallest graph the Quickstart describes.
+ * `/quickstart` — the graph the Quickstart's TypeScript tab publishes.
  *
- * The Quickstart's "use an existing agent" tab shows this graph in Python
- * (`mock_llm` over `MessagesState`, one edge in, one edge out) even on the
- * TypeScript docs; the "start from scratch" tab is where LangGraph
- * (JavaScript) is offered, and it only tells you the export must match the
- * name in `langgraph.json`. What follows is that same one-node graph written
- * against the TypeScript API, exported as `graph` so `langgraph.json` can
- * point `sample_agent` at it.
- *
- * Deliberately *not* extending `CopilotKitStateAnnotation`: the Quickstart's
- * graph doesn't, and the point of this route is to prove the minimum works.
- * Every other route in this repo extends it, because every other route needs
- * the frontend-tool or context channel it opens.
+ * Since doc-sync 2026-11-09 the Quickstart has a TypeScript tab of its own
+ * ("src/agent.ts"), copied verbatim below: one `mock_llm` node over
+ * `MessagesAnnotation`, model `gpt-6-luna` with `reasoning_effort: "none"`,
+ * and no checkpointer, because the LangGraph API server supplies persistence.
+ * `backend/langgraph.json` maps `sample_agent` to this `graph` export, the
+ * same mapping as the page's own `langgraph.json`.
  */
 
-import type { RunnableConfig } from "@langchain/core/runnables";
+//#region agent
 import { SystemMessage } from "@langchain/core/messages";
+import { ChatOpenAI } from "@langchain/openai";
 import {
   END,
-  MemorySaver,
   MessagesAnnotation,
   START,
   StateGraph,
 } from "@langchain/langgraph";
 
-import { chatModel } from "./model.js";
-
-//#region agent
-async function mockLlm(
-  state: typeof MessagesAnnotation.State,
-  config: RunnableConfig,
-) {
-  const model = chatModel();
-  const systemMessage = new SystemMessage({
-    content: "You are a helpful assistant.",
-  });
-
-  const response = await model.invoke([systemMessage, ...state.messages], config);
-
+async function mockLlm(state: typeof MessagesAnnotation.State) {
+  const model = new ChatOpenAI({ modelKwargs: { reasoning_effort: "none" }, model: "gpt-6-luna" });
+  const response = await model.invoke([
+    new SystemMessage("You are a helpful assistant."),
+    ...state.messages,
+  ]);
   return { messages: response };
 }
 
-const workflow = new StateGraph(MessagesAnnotation)
+export const graph = new StateGraph(MessagesAnnotation)
   .addNode("mock_llm", mockLlm)
   .addEdge(START, "mock_llm")
-  .addEdge("mock_llm", END);
-
-export const graph = workflow.compile({ checkpointer: new MemorySaver() });
+  .addEdge("mock_llm", END)
+  .compile();
 //#endregion

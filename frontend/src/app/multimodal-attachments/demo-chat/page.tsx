@@ -40,6 +40,11 @@ export default function Page() {
               // rejection path is reachable without hunting for a huge file.
               accept: "image/*,application/pdf,text/plain",
               maxSize: 5 * 1024 * 1024,
+              // From the page's "Upload concurrency" section (doc-sync
+              // 2026-11-09). Its `onUpload: async (file) => uploadToStorage(file)`
+              // line is not copied: `uploadToStorage` is never defined, and the
+              // default inline-upload path is what this demo tests.
+              maxConcurrentUploads: 3, // three files at a time
               onUploadFailed: (error) => {
                 setRejected((r) => [
                   ...r,

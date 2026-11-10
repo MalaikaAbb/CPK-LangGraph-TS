@@ -1,15 +1,13 @@
 /**
- * `/agent-config` — the graph the Agent Config page publishes in full.
- *
- * Reproduced verbatim except for the model construction (README §9).
+ * `/agent-config` — the graph the Agent Config page publishes in full,
+ * verbatim (doc-sync 2026-11-09: inline `gpt-6-luna` model, `runChatNode` /
+ * `compileGraph`). Harness changes: the `#region` comment markers only.
  *
  * Worth reading closely: `readConfig` accepts the config from *either*
  * channel. `useAgentContext` values land on `state.copilotkit.context` (which
  * may itself be a string, an object, or an array of `{ description, value }`
  * entries depending on how the runtime serialised them), and provider-level
- * `properties` land on `config.configurable.properties`. The page's LangGraph
- * flavour uses the first; the tolerant reader is what makes the same node work
- * under both.
+ * `properties` land on `config.configurable.properties`.
  */
 
 import type { RunnableConfig } from "@langchain/core/runnables";
@@ -21,12 +19,11 @@ import {
   StateGraph,
   Annotation,
 } from "@langchain/langgraph";
-
+import { ChatOpenAI } from "@langchain/openai";
 import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langgraph";
 
-import { chatModel } from "./model.js";
+//#region read-config  [harness marker]
 
-//#region read-config
 type Tone = "professional" | "casual" | "enthusiastic";
 type Expertise = "beginner" | "intermediate" | "expert";
 type ResponseLength = "concise" | "detailed";
@@ -69,7 +66,7 @@ function extractConfigContext(context: unknown): Record<string, unknown> {
   }
 
   if (Array.isArray(context)) {
-    for (const entry of [...context].reverse()) {
+    for (const entry of [...context].toReversed()) {
       const extracted = extractConfigContext(entry);
       if (containsConfigKeys(extracted)) return extracted;
     }
@@ -151,8 +148,11 @@ function buildSystemPrompt(props: ResolvedProps): string {
   ].join("\n");
 }
 
-async function chatNode(state: AgentState, config: RunnableConfig) {
-  const model = chatModel({ model: "gpt-4o-mini", temperature: 0.4 });
+async function runChatNode(
+  state: AgentState,
+  config: RunnableConfig,
+  model: ChatOpenAI,
+) {
   const props = readConfig(state, config);
   const systemPrompt = buildSystemPrompt(props);
 
@@ -164,12 +164,25 @@ async function chatNode(state: AgentState, config: RunnableConfig) {
   return { messages: response };
 }
 
-const workflow = new StateGraph(AgentStateAnnotation)
-  .addNode("chat_node", chatNode)
-  .addEdge(START, "chat_node")
-  .addEdge("chat_node", "__end__");
+async function chatNode(state: AgentState, config: RunnableConfig) {
+  return runChatNode(
+    state,
+    config,
+    new ChatOpenAI({
+      modelKwargs: { reasoning_effort: "none" },
+      model: "gpt-6-luna",
+      temperature: 0.4,
+    }),
+  );
+}
 
-const memory = new MemorySaver();
+function compileGraph(node: typeof chatNode) {
+  return new StateGraph(AgentStateAnnotation)
+    .addNode("chat_node", node)
+    .addEdge(START, "chat_node")
+    .addEdge("chat_node", "__end__")
+    .compile({ checkpointer: new MemorySaver() });
+}
 
-export const graph = workflow.compile({ checkpointer: memory });
+export const graph = compileGraph(chatNode);
 //#endregion

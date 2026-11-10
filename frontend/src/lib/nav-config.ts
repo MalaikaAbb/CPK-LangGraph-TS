@@ -201,6 +201,18 @@ export const NAV: NavGroup[] = [
         statusNote:
           "Needs a model that emits reasoning tokens (defaults to o4-mini) AND a verified OpenAI org, since reasoning summaries are gated behind verification — set OPENAI_REASONING_SUMMARY=off if yours is not. Token streaming is disabled here so the trace and the answer stay separate.",
       },
+      {
+        path: "/custom-look-and-feel/markdown",
+        hasDemo: true,
+        agentId: "chat-markdown",
+        title: "Markdown Rendering",
+        docPath: "/langgraph-typescript/custom-look-and-feel/markdown",
+        summary:
+          "The markdownRenderer slot on assistant messages in all three forms: a Streamdown components map, a class string, and a whole replacement component.",
+        status: "partial",
+        statusNote:
+          "Snippets verbatim; route ported from aws-strands-ts. The page defines no CSS for its my-link / my-heading classes, so the first example is only visible in DevTools. Not yet checked in a browser here.",
+      },
     ],
   },
   {
@@ -265,7 +277,7 @@ export const NAV: NavGroup[] = [
           "A named renderer for the get_weather tool, plus the wildcard catch-all from useDefaultRenderTool.",
         status: "partial",
         statusNote:
-          "get_weather only — it is the sole backend tool the page actually defines. search_flights, get_stock_price and roll_dice appear only as renderer props.",
+          "Backend is the page's Code-tab agent with all four tools (get_weather, search_flights, get_stock_price, roll_d20); only get_weather has a named renderer, the rest go through the catch-all. Grouping controls (toolCallDisplay, group: true) not yet checked in a browser.",
       },
       {
         path: "/generative-ui/state-rendering",
@@ -276,6 +288,16 @@ export const NAV: NavGroup[] = [
         summary:
           "Rendering agent state as it changes, driven by the same emitIntermediateState mapping as State Streaming.",
         status: "working",
+      },
+      {
+        path: "/generative-ui/a2ui",
+        title: "A2UI",
+        docPath: "/langgraph-typescript/generative-ui/a2ui",
+        summary:
+          "The A2UI overview: three operations, two approaches, two ways to switch it on, and the surface color variables.",
+        status: "reference",
+        statusNote:
+          "Overview page. Its setup paths are exercised by the Dynamic Schema (catalog on provider) and Fixed Schema (runtime a2ui block) routes; the no-catalog injectA2UITool: true combination and the CSS variables are shown, not run.",
       },
       {
         path: "/generative-ui/a2ui/dynamic-schema",
@@ -422,7 +444,9 @@ export const NAV: NavGroup[] = [
         docPath: "/langgraph-typescript/frontend-tools",
         summary:
           "A tool the agent calls that executes in the browser and changes the page.",
-        status: "working",
+        status: "partial",
+        statusNote:
+          "Main graph verbatim (gpt-6-luna). New no-model graph (/frontend-tools/no-model) and useFrontendTools list demo (/frontend-tools/tool-list) not yet checked in a browser; the list demo's reports/navigate are repo-authored.",
       },
       {
         path: "/human-in-the-loop",
@@ -497,7 +521,9 @@ export const NAV: NavGroup[] = [
         docPath: "/langgraph-typescript/shared-state/agent-readonly",
         summary:
           "useAgentContext as a one-way UI-to-agent channel — props for the agent, with no setter.",
-        status: "working",
+        status: "partial",
+        statusNote:
+          "Backend graph was missing from langgraph.json; now the page's Code-tab agent verbatim (gpt-6-luna; the unpublished makeChatOpenAI swapped for the repo's chatModel). Not yet checked in a browser.",
       },
       {
         path: "/agent-app-context",
@@ -568,7 +594,9 @@ export const NAV: NavGroup[] = [
         docPath: "/langgraph-typescript/multi-agent/subagents",
         summary:
           "A supervisor delegating to research, writing and critique sub-agents, with a live delegation log.",
-        status: "working",
+        status: "partial",
+        statusNote:
+          "Backend is the page's Code-tab subagents.ts verbatim. Its append-only delegations reducer contradicts the page's own merge-by-id callout, so the log doubles on a continued thread (README §9 item 19).",
       },
       {
         path: "/subgraphs",
@@ -604,8 +632,10 @@ export const NAV: NavGroup[] = [
         title: "Configurable",
         docPath: "/langgraph-typescript/configurable",
         summary:
-          "Per-run execution parameters that ride on config.configurable and never touch agent state.",
-        status: "working",
+          "Server-owned execution settings: the trusted runtime route sets LangGraph context and recursion_limit; the browser sends none.",
+        status: "partial",
+        statusNote:
+          "The page publishes only a graph.invoke(..., { context, recursionLimit }) fragment. Context schema, node and runtime wiring are repo-authored (README §9 item 18). Not yet checked in a browser.",
       },
     ],
   },
