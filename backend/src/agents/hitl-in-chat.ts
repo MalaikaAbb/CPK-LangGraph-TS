@@ -1,6 +1,7 @@
 // Verbatim from the Code tab of https://docs.copilotkit.ai/langgraph-typescript/human-in-the-loop/index
-// ("src/agent/hitl-in-chat.ts", doc-sync 2026-11-09). `./openai-headers` is borrowed from the
-// CopilotKit showcase (README §9 item 2).
+// ("src/agent/hitl-in-chat.ts", doc-sync 2026-11-09). Harness change: the unpublished
+// `makeChatOpenAI(config, …)` (./openai-headers, an aimock/CVDIAG-only showcase
+// helper) is swapped for `new ChatOpenAI(…)` with the same options (README §9 item 2).
 
 /**
  * LangGraph TypeScript agent backing the In-Chat HITL (useHumanInTheLoop) demo.
@@ -16,7 +17,7 @@ import type { RunnableConfig } from "@langchain/core/runnables";
 import { SystemMessage } from "@langchain/core/messages";
 import { MemorySaver, START, StateGraph } from "@langchain/langgraph";
 import { ChatOpenAI } from "@langchain/openai";
-import { makeChatOpenAI } from "./openai-headers";
+// doc: import { makeChatOpenAI } from "./openai-headers";
 
 import {
   convertActionsToDynamicStructuredTools,
@@ -33,7 +34,7 @@ const SYSTEM_PROMPT =
   "Keep any chat reply to one short sentence.";
 
 async function chatNode(state: AgentState, config: RunnableConfig) {
-  const model = makeChatOpenAI(config, {
+  const model = new ChatOpenAI({
     temperature: 0,
     model: "gpt-6-luna",
   });

@@ -25,16 +25,19 @@ export default function Page() {
         </div>
       </Panel>
 
-      <Callout tone="info" title="Doc regions verbatim inside borrowed showcase files">
+      <Callout tone="info" title="Doc regions verbatim; minimal stand-ins around them">
         <p>
           The page prints the <code>schedule_meeting</code> tool and the{" "}
           <code>useInterrupt</code> render as excerpts, without the graph
           assembly, <code>TimePickerCard</code>,{" "}
-          <code>generateFallbackSlots</code> or the suggestions hook. The full
-          files come from the CopilotKit showcase (<code>interrupt-agent.ts</code>,{" "}
-          <code>gen-ui-interrupt/</code>, <code>_shared/</code>), and the
-          page&apos;s excerpts are the files&apos; <code>@region</code>{" "}
-          blocks, unchanged. See README §9.
+          <code>generateFallbackSlots</code> or the suggestions hook. The agent
+          (<code>interrupt-agent.ts</code>) and{" "}
+          <code>_shared/interrupt-fallback-slots.ts</code> come from the
+          CopilotKit showcase, with the page&apos;s excerpts as their{" "}
+          <code>@region</code> blocks, unchanged. <code>TimePickerCard</code>{" "}
+          is a minimal stand-in with the showcase card&apos;s props; the
+          suggestions hook is not copied (its call is commented out). See
+          README §9.
         </p>
       </Callout>
 

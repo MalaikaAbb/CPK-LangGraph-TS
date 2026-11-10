@@ -1,6 +1,9 @@
 // Borrowed from the CopilotKit showcase:
 // https://github.com/CopilotKit/CopilotKit/blob/a358fa06ee1ee05a2e8a61f85461bdbabffbbd77/showcase/integrations/langgraph-typescript/src/agent/interrupt-agent.ts
-// The doc page publishes the @region parts of this file verbatim.
+// The doc page publishes the @region parts of this file verbatim. Harness change
+// outside the region: the unpublished `makeChatOpenAI(config, …)` (./openai-headers,
+// an aimock/CVDIAG-only showcase helper) is swapped for this repo's `chatModel(…)`
+// with the same options (README §9 item 2).
 
 /**
  * LangGraph TypeScript agent for the Interrupt-based Generative UI demos.
@@ -14,7 +17,7 @@
  * Ported from `src/agents/interrupt_agent.py` in the langgraph-python package.
  */
 
-import { makeChatOpenAI } from "./openai-headers";
+import { chatModel } from "./model.js"; // doc: import { makeChatOpenAI } from "./openai-headers";
 
 // @region[backend-interrupt-tool]
 import { z } from "zod";
@@ -135,7 +138,7 @@ const scheduleMeeting = tool(
 const tools = [scheduleMeeting];
 
 async function chatNode(state: AgentState, config: RunnableConfig) {
-  const model = makeChatOpenAI(config, {
+  const model = chatModel({
     model: "gpt-6-luna",
   });
 

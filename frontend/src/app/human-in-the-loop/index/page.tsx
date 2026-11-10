@@ -33,8 +33,9 @@ export default function Page() {
           repo&apos;s main runtime, where <code>hitl-in-chat</code> now maps to
           the doc&apos;s agent. <code>/human-in-the-loop</code> shares it. The
           Code tab&apos;s 190-line showcase <code>route.ts</code> is replaced
-          by the existing runtime route; its <code>makeChatOpenAI</code> is
-          borrowed from the showcase.
+          by the existing runtime route; its unpublished{" "}
+          <code>makeChatOpenAI</code> is swapped for{" "}
+          <code>new ChatOpenAI(…)</code> with the same options.
         </p>
       </Callout>
 

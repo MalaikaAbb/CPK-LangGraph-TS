@@ -26,11 +26,14 @@ export default function Page() {
         </div>
       </Panel>
 
-      <Callout tone="info" title="Borrowed full file; page excerpts verbatim">
+      <Callout tone="info" title="Page file verbatim; one stand-in">
         <p>
           The page prints this demo&apos;s main file and two smaller panels.
-          The full file and <code>_shared/interrupt-fallback-slots.ts</code>{" "}
-          come from the CopilotKit showcase. The agent is the useInterrupt
+          The main file is the page&apos;s, verbatim; the{" "}
+          <code>AppSurface</code> it renders but never defines is a minimal
+          slot picker written here (the showcase&apos;s styled popup is not
+          copied), and <code>_shared/interrupt-fallback-slots.ts</code> comes
+          from the CopilotKit showcase. The agent is the useInterrupt
           page&apos;s <code>interrupt-agent.ts</code>, registered again as{" "}
           <code>interrupt-headless</code>.
         </p>

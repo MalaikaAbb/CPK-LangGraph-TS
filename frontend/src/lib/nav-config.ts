@@ -346,7 +346,7 @@ export const NAV: NavGroup[] = [
           "The overview's demo: useHumanInTheLoop suspending the run behind an in-chat time picker.",
         status: "partial",
         statusNote:
-          "Code tab verbatim (agent, demo page, card); makeChatOpenAI borrowed from the showcase; the Code tab's showcase route.ts replaced by the main runtime. Not yet checked in a browser.",
+          "Code tab verbatim (agent, demo page, card); makeChatOpenAI swapped for new ChatOpenAI; the Code tab's showcase route.ts replaced by the main runtime. Not yet checked in a browser.",
       },
       {
         path: "/human-in-the-loop/useInterrupt",
@@ -358,7 +358,7 @@ export const NAV: NavGroup[] = [
           "A backend tool pauses the graph with interrupt(); useInterrupt renders a picker in the chat and resolve() resumes it.",
         status: "partial",
         statusNote:
-          "Page excerpts are verbatim @region blocks of the CopilotKit showcase files used here (agent graph assembly, TimePickerCard, generateFallbackSlots, suggestions are the showcase's). Not yet checked in a browser.",
+          "Page excerpts are verbatim @region blocks of the CopilotKit showcase files used here (agent graph assembly and generateFallbackSlots are the showcase's; TimePickerCard is a minimal stand-in; the suggestions hook is not copied). Not yet checked in a browser.",
       },
       {
         path: "/human-in-the-loop/headless",
@@ -370,7 +370,7 @@ export const NAV: NavGroup[] = [
           "The same interrupt resolved from the app surface through a hand-rolled useHeadlessInterrupt over useAgent.",
         status: "partial",
         statusNote:
-          "Demo is the showcase interrupt-headless page (the doc prints its main file); agent shared with useInterrupt. Not yet checked in a browser.",
+          "Demo is the doc's interrupt-headless file verbatim plus a minimal stand-in for its undefined AppSurface; agent shared with useInterrupt. Not yet checked in a browser.",
       },
       {
         path: "/human-in-the-loop/governed-actions",
