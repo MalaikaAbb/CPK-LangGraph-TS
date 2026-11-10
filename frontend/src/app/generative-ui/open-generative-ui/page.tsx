@@ -33,14 +33,17 @@ export default function Page() {
         </div>
       </Panel>
 
-      <Callout tone="info" title="Code tab verbatim; three files borrowed">
+      <Callout tone="info" title="Code tab verbatim; one file borrowed">
         <p>
           Both agents, the runtime route and both demo pages are the
           page&apos;s Code tab. The minimal demo imports <code>./chat</code>{" "}
-          and <code>./design-skill</code>, which the tab does not show. They
-          and the chat&apos;s <code>suggestions.ts</code> come from the
-          CopilotKit showcase, as does <code>makeChatOpenAI</code>. See README
-          §9.
+          and <code>./design-skill</code>, which the tab does not show. A minimal{" "}
+          <code>chat.tsx</code> is adapted from the CopilotKit showcase; the
+          showcase&apos;s design-skill prompt and every suggestion-chip file
+          (including the advanced demo&apos;s) are left out, so the default
+          design skill is used. The agents&apos; unpublished{" "}
+          <code>makeChatOpenAI</code> is swapped for{" "}
+          <code>new ChatOpenAI(…)</code>. See README §9.
         </p>
       </Callout>
 

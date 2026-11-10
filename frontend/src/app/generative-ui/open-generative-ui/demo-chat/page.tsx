@@ -22,7 +22,9 @@
 import React from "react";
 import { CopilotKit } from "@copilotkit/react-core/v2";
 
-import { VISUALIZATION_DESIGN_SKILL } from "./design-skill";
+// Harness change: `./design-skill` is not in the Code tab and is a showcase-only
+// prompt, so it is not copied; the default design skill is used (README §9 item 18).
+// doc: import { VISUALIZATION_DESIGN_SKILL } from "./design-skill";
 import { Chat } from "./chat";
 
 export default function OpenGenUiDemo() {
@@ -35,7 +37,7 @@ export default function OpenGenUiDemo() {
     <CopilotKit
       runtimeUrl="/api/copilotkit-ogui"
       agent="open-gen-ui"
-      openGenerativeUI={{ designSkill: VISUALIZATION_DESIGN_SKILL }}
+      openGenerativeUI={{ /* doc: designSkill: VISUALIZATION_DESIGN_SKILL */ }}
     >
       <div className="flex justify-center items-center h-screen w-full">
         <div className="h-full w-full max-w-4xl flex flex-col p-3">

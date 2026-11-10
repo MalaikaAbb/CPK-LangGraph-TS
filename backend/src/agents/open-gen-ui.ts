@@ -29,7 +29,9 @@ import {
   Annotation,
 } from "@langchain/langgraph";
 import { ChatOpenAI } from "@langchain/openai";
-import { makeChatOpenAI } from "./openai-headers";
+// Harness change: the Code tab's unpublished `makeChatOpenAI(config, …)` (./openai-headers,
+// an aimock/CVDIAG-only showcase helper) is swapped for `new ChatOpenAI(…)` with the same options (README §9 item 2).
+// doc: import { makeChatOpenAI } from "./openai-headers";
 
 import {
   convertActionsToDynamicStructuredTools,
@@ -73,7 +75,7 @@ const AgentStateAnnotation = Annotation.Root({
 type AgentState = typeof AgentStateAnnotation.State;
 
 async function chatNode(state: AgentState, config: RunnableConfig) {
-  const model = makeChatOpenAI(config, {
+  const model = new ChatOpenAI({
     model: "gpt-6-luna",
     modelKwargs: { parallel_tool_calls: false },
   });

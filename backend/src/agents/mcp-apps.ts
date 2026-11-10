@@ -27,7 +27,9 @@ import {
   Annotation,
 } from "@langchain/langgraph";
 import { ChatOpenAI } from "@langchain/openai";
-import { makeChatOpenAI } from "./openai-headers";
+// Harness change: the Code tab's unpublished `makeChatOpenAI(config, …)` (./openai-headers,
+// an aimock/CVDIAG-only showcase helper) is swapped for `new ChatOpenAI(…)` with the same options (README §9 item 2).
+// doc: import { makeChatOpenAI } from "./openai-headers";
 
 import {
   convertActionsToDynamicStructuredTools,
@@ -75,7 +77,7 @@ export type AgentState = typeof AgentStateAnnotation.State;
 async function chatNode(state: AgentState, config: RunnableConfig) {
   // gpt-6-luna for speed — Excalidraw element emission is simple JSON and
   // we're biasing hard toward sub-30s generation.
-  const model = makeChatOpenAI(config, {
+  const model = new ChatOpenAI({
     temperature: 0,
     model: "gpt-6-luna",
   });

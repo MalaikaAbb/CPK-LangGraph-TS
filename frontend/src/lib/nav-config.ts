@@ -311,7 +311,7 @@ export const NAV: NavGroup[] = [
           "An MCP server's UI resources rendered inline in the chat as sandboxed iframes, wired by the runtime's mcpApps.servers.",
         status: "partial",
         statusNote:
-          "The page's Code tab verbatim (agent, runtime route, demo page) pointed at the public Excalidraw MCP server. ./chat and its suggestions and makeChatOpenAI are borrowed from the CopilotKit showcase. Not yet checked in a browser.",
+          "The page's Code tab verbatim (agent, runtime route, demo page) pointed at the public Excalidraw MCP server. A minimal ./chat is adapted from the CopilotKit showcase (no suggestion chips); makeChatOpenAI swapped for new ChatOpenAI. Not yet checked in a browser.",
       },
       {
         path: "/generative-ui/open-generative-ui",
@@ -323,7 +323,7 @@ export const NAV: NavGroup[] = [
           "generateSandboxedUi streaming agent-written HTML/CSS/JS into a sandboxed iframe; an advanced variant adds sandbox functions that call back into the host.",
         status: "partial",
         statusNote:
-          "The page's Code tab verbatim (two agents, runtime route, both demo pages). ./chat, ./design-skill and the minimal demo's suggestions, plus makeChatOpenAI, are borrowed from the CopilotKit showcase. Advanced variant at /generative-ui/open-generative-ui/advanced. Not yet checked in a browser.",
+          "The page's Code tab verbatim (two agents, runtime route, both demo pages). A minimal ./chat is adapted from the CopilotKit showcase; ./design-skill and all suggestion chips left out (default design skill); makeChatOpenAI swapped for new ChatOpenAI. Advanced variant at /generative-ui/open-generative-ui/advanced. Not yet checked in a browser.",
       },
     ],
   },

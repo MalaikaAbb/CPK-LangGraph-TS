@@ -25,12 +25,14 @@ export default function Page() {
         </div>
       </Panel>
 
-      <Callout tone="info" title="Code tab verbatim; two files borrowed">
+      <Callout tone="info" title="Code tab verbatim; one file borrowed">
         <p>
           Agent, runtime route and demo page are the page&apos;s Code tab. The
           demo imports <code>./chat</code>, which the tab does not show, so{" "}
-          <code>chat.tsx</code> and <code>suggestions.ts</code> come from the
-          CopilotKit showcase, as does <code>makeChatOpenAI</code>. The runtime
+          a minimal <code>chat.tsx</code> is adapted from the CopilotKit
+          showcase (its suggestion chips left out). The agent&apos;s unpublished{" "}
+          <code>makeChatOpenAI</code> is swapped for{" "}
+          <code>new ChatOpenAI(…)</code>. The runtime
           route also registers a <code>headless_complete</code> graph that this
           repo does not have (its id here is <code>headless-complete</code>);
           only the <code>mcp-apps</code> agent is used. See README §9.
