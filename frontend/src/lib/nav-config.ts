@@ -201,6 +201,18 @@ export const NAV: NavGroup[] = [
         statusNote:
           "Needs a model that emits reasoning tokens (defaults to o4-mini) AND a verified OpenAI org, since reasoning summaries are gated behind verification — set OPENAI_REASONING_SUMMARY=off if yours is not. Token streaming is disabled here so the trace and the answer stay separate.",
       },
+      {
+        path: "/custom-look-and-feel/markdown",
+        hasDemo: true,
+        agentId: "chat-markdown",
+        title: "Markdown Rendering",
+        docPath: "/langgraph-typescript/custom-look-and-feel/markdown",
+        summary:
+          "The markdownRenderer slot on assistant messages in all three forms: a Streamdown components map, a class string, and a whole replacement component.",
+        status: "partial",
+        statusNote:
+          "Snippets verbatim; route ported from aws-strands-ts. The page defines no CSS for its my-link / my-heading classes, so the first example is only visible in DevTools. Not yet checked in a browser here.",
+      },
     ],
   },
   {
@@ -265,7 +277,7 @@ export const NAV: NavGroup[] = [
           "A named renderer for the get_weather tool, plus the wildcard catch-all from useDefaultRenderTool.",
         status: "partial",
         statusNote:
-          "get_weather only — it is the sole backend tool the page actually defines. search_flights, get_stock_price and roll_dice appear only as renderer props.",
+          "Backend is the page's Code-tab agent with all four tools (get_weather, search_flights, get_stock_price, roll_d20); only get_weather has a named renderer, the rest go through the catch-all. Grouping controls (toolCallDisplay, group: true) not yet checked in a browser.",
       },
       {
         path: "/generative-ui/state-rendering",
@@ -276,6 +288,16 @@ export const NAV: NavGroup[] = [
         summary:
           "Rendering agent state as it changes, driven by the same emitIntermediateState mapping as State Streaming.",
         status: "working",
+      },
+      {
+        path: "/generative-ui/a2ui",
+        title: "A2UI",
+        docPath: "/langgraph-typescript/generative-ui/a2ui",
+        summary:
+          "The A2UI overview: three operations, two approaches, two ways to switch it on, and the surface color variables.",
+        status: "reference",
+        statusNote:
+          "Overview page. Its setup paths are exercised by the Dynamic Schema (catalog on provider) and Fixed Schema (runtime a2ui block) routes; the no-catalog injectA2UITool: true combination and the CSS variables are shown, not run.",
       },
       {
         path: "/generative-ui/a2ui/dynamic-schema",
@@ -301,6 +323,136 @@ export const NAV: NavGroup[] = [
         statusNote:
           "The Book button is inert: the page notes a2ui.render does not yet accept action_handlers.",
       },
+      {
+        path: "/generative-ui/mcp-apps",
+        hasDemo: true,
+        agentId: "mcp_apps",
+        title: "MCP Apps",
+        docPath: "/langgraph-typescript/generative-ui/mcp-apps",
+        summary:
+          "An MCP server's UI resources rendered inline in the chat as sandboxed iframes, wired by the runtime's mcpApps.servers.",
+        status: "partial",
+        statusNote:
+          "The page's Code tab verbatim (agent, runtime route, demo page) pointed at the public Excalidraw MCP server. A minimal ./chat is adapted from the CopilotKit showcase (no suggestion chips); makeChatOpenAI swapped for new ChatOpenAI. Not yet checked in a browser.",
+      },
+      {
+        path: "/generative-ui/open-generative-ui",
+        hasDemo: true,
+        agentId: "open_gen_ui",
+        title: "Open Generative UI",
+        docPath: "/langgraph-typescript/generative-ui/open-generative-ui",
+        summary:
+          "generateSandboxedUi streaming agent-written HTML/CSS/JS into a sandboxed iframe; an advanced variant adds sandbox functions that call back into the host.",
+        status: "partial",
+        statusNote:
+          "The page's Code tab verbatim (two agents, runtime route, both demo pages). A minimal ./chat and ./design-skill (feeds the openGenerativeUI.designSkill prop the page teaches) are borrowed from the CopilotKit showcase; all suggestion chips left out; makeChatOpenAI swapped for new ChatOpenAI. Advanced variant at /generative-ui/open-generative-ui/advanced. Not yet checked in a browser.",
+        path: "/generative-ui/components",
+        hasDemo: true,
+        agentId: "genui",
+        title: "Components and surfaces",
+        docPath: "/langgraph-typescript/generative-ui/components",
+        summary:
+          "standardUI on the provider: the runtime adds render_ui and its guide, and the agent answers with streamed A2UI 1.0 components.",
+        status: "partial",
+        statusNote:
+          "The page's runtime is a BuiltInAgent TanStack factory (shown, not run); here the same provider config is served by this repo's genui LangGraph graph. Needs @copilotkit 1.85 (bumped here). Not yet checked in a browser.",
+      },
+      {
+        path: "/generative-ui/components/surfaces",
+        hasDemo: true,
+        agentId: "genui",
+        title: "Components · Surfaces",
+        docPath: "/langgraph-typescript/generative-ui/components/surfaces",
+        summary:
+          "GenerativeUISurface page targets the chat can fill, limit, scroll to, and replace, with per-component error boundaries.",
+        status: "partial",
+        statusNote:
+          "Ported from aws-strands-ts; built, not yet checked in a browser. Needs @copilotkit 1.85 (bumped here). All published snippets run. Product, ProductRow and the product list are repo scaffolding; ./catalog is taken to be the Catalogs page's shopUI; the model invents the products (no products tool).",
+      },
+      {
+        path: "/generative-ui/components/catalogs",
+        hasDemo: true,
+        agentId: "genui",
+        title: "Components · Catalogs",
+        docPath: "/langgraph-typescript/generative-ui/components/catalogs",
+        summary:
+          "createGenerativeUI catalogs: typed components, zod and Valibot props, extends, parameterOrder and exportA2UICatalog.",
+        status: "partial",
+        statusNote:
+          "Ported from aws-strands-ts; built, not yet checked in a browser. Needs @copilotkit 1.85 (bumped here). Every snippet runs; Hero, Panel and cartUI are repo scaffolding. fs.writeFileSync is replaced by printing the exported catalog.",
+      },
+      {
+        path: "/generative-ui/components/standard-catalog",
+        hasDemo: true,
+        agentId: "genui",
+        title: "Components · Standard catalog",
+        docPath: "/langgraph-typescript/generative-ui/components/standard-catalog",
+        summary:
+          "standardUI's 69 components as is, extended with a ProductCard, with Map/Video/HtmlView omitted, and with Card overridden.",
+        status: "partial",
+        statusNote:
+          "Ported from aws-strands-ts; built, not yet checked in a browser. Needs @copilotkit 1.85 (bumped here). ProductCard and productSchema are repo scaffolding.",
+      },
+      {
+        path: "/generative-ui/components/state-and-actions",
+        hasDemo: true,
+        agentId: "genui",
+        title: "Components · State and actions",
+        docPath: "/langgraph-typescript/generative-ui/components/state-and-actions",
+        summary:
+          "App state bound into props, functions run on click, events sent to the agent, and writable props that keep user input.",
+        status: "partial",
+        statusNote:
+          "Ported from aws-strands-ts; built, not yet checked in a browser. Needs @copilotkit 1.85 (bumped here). Cart, cart.addItem, the state-catalog ProductCard and the catalogs around the fragment snippets are repo scaffolding. Renderer functions cannot be called by the agent in this version, so allowedCallers is shown as exported only.",
+      },
+      {
+        path: "/generative-ui/components/theming",
+        hasDemo: true,
+        agentId: "genui",
+        title: "Components · Theming",
+        docPath: "/langgraph-typescript/generative-ui/components/theming",
+        summary:
+          "The theme option's CSS variables, a typed GenerativeUITheme file, dark-mode overrides, map styles, and .a2ui-surface CSS.",
+        status: "partial",
+        statusNote:
+          "Ported from aws-strands-ts; built, not yet checked in a browser. Needs @copilotkit 1.85 (bumped here). The dark-mode script renders in the demo body, not <head>. The page's mapStyle URLs are placeholders, so the Map variant draws no basemap.",
+      },
+      {
+        path: "/generative-ui/components/transports",
+        hasDemo: true,
+        agentId: "genui",
+        title: "Components · Transports",
+        docPath: "/langgraph-typescript/generative-ui/components/transports",
+        summary:
+          "The render_ui tool transport vs the markdown transport, the runtime's generativeUI flag, and agentIds scoping.",
+        status: "partial",
+        statusNote:
+          "Ported from aws-strands-ts; built, not yet checked in a browser. Needs @copilotkit 1.85 (bumped here). The runtime sample's agent is undefined; this repo's genui LangGraph graph stands in, plus a shop agent so agentIds has one agent inside and one outside.",
+      },
+      {
+        path: "/generative-ui/components/markdown-mode",
+        hasDemo: true,
+        agentId: "genui",
+        title: "Components · Markdown mode",
+        docPath: "/langgraph-typescript/generative-ui/components/markdown-mode",
+        summary:
+          "The agent writes A2UI operations in a2ui code blocks inside its reply; sendContext: false moves the catalog into forwardedProps.",
+        status: "partial",
+        statusNote:
+          "Ported from aws-strands-ts; built, not yet checked in a browser. Needs @copilotkit 1.85 (bumped here). The sendContext: false variant renders no UI by design: the only backend shown for it is Python reading forwarded_props, which this repo's TypeScript graph does not.",
+      },
+      {
+        path: "/generative-ui/components/from-a2ui",
+        hasDemo: true,
+        agentId: "genui",
+        title: "Components · Adopt from A2UI",
+        docPath: "/langgraph-typescript/generative-ui/components/from-a2ui",
+        summary:
+          "The v0.9 a2ui renderer → A2UI 1.0 migration: the After catalog running on the new engine, with the Before code shown.",
+        status: "partial",
+        statusNote:
+          "Ported from aws-strands-ts; built, not yet checked in a browser. Needs @copilotkit 1.85 (bumped here). Airport and Arrow are repo scaffolding. The support matrix rules out @ag-ui/a2ui-toolkit 0.0.5 agent tools, (aws-strands-ts's fixed-schema agent; this repo's builds operations by hand).",
+      },
     ],
   },
   {
@@ -314,7 +466,9 @@ export const NAV: NavGroup[] = [
         docPath: "/langgraph-typescript/frontend-tools",
         summary:
           "A tool the agent calls that executes in the browser and changes the page.",
-        status: "working",
+        status: "partial",
+        statusNote:
+          "Main graph verbatim (gpt-6-luna). New no-model graph (/frontend-tools/no-model) and useFrontendTools list demo (/frontend-tools/tool-list) not yet checked in a browser; the list demo's reports/navigate are repo-authored.",
       },
       {
         path: "/human-in-the-loop",
@@ -401,7 +555,9 @@ export const NAV: NavGroup[] = [
         docPath: "/langgraph-typescript/shared-state/agent-readonly",
         summary:
           "useAgentContext as a one-way UI-to-agent channel — props for the agent, with no setter.",
-        status: "working",
+        status: "partial",
+        statusNote:
+          "Backend graph was missing from langgraph.json; now the page's Code-tab agent verbatim (gpt-6-luna; the unpublished makeChatOpenAI swapped for the repo's chatModel). Not yet checked in a browser.",
       },
       {
         path: "/agent-app-context",
@@ -472,7 +628,9 @@ export const NAV: NavGroup[] = [
         docPath: "/langgraph-typescript/multi-agent/subagents",
         summary:
           "A supervisor delegating to research, writing and critique sub-agents, with a live delegation log.",
-        status: "working",
+        status: "partial",
+        statusNote:
+          "Backend is the page's Code-tab subagents.ts verbatim. Its append-only delegations reducer contradicts the page's own merge-by-id callout, so the log doubles on a continued thread (README §9 item 19).",
       },
       {
         path: "/subgraphs",
@@ -508,8 +666,10 @@ export const NAV: NavGroup[] = [
         title: "Configurable",
         docPath: "/langgraph-typescript/configurable",
         summary:
-          "Per-run execution parameters that ride on config.configurable and never touch agent state.",
-        status: "working",
+          "Server-owned execution settings: the trusted runtime route sets LangGraph context and recursion_limit; the browser sends none.",
+        status: "partial",
+        statusNote:
+          "The page publishes only a graph.invoke(..., { context, recursionLimit }) fragment. Context schema, node and runtime wiring are repo-authored (README §9 item 18). Not yet checked in a browser.",
       },
     ],
   },

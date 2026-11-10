@@ -46,6 +46,31 @@ export default function Page() {
         <SourceCode file="frontend/src/app/custom-look-and-feel/slots/demo-chat/page.tsx" />
       </Panel>
 
+      <Panel
+        title="Tool calls slot"
+        description="messageView.assistantMessage.toolCallsView — a second demo, since it uses the assistantMessage slot differently from the one above."
+      >
+        <p className="text-sm text-slate-700 dark:text-slate-300">
+          The page wraps the default <code>CopilotChatToolCallsView</code> in a
+          dashed border, keeping whatever tool renderers are registered. Open{" "}
+          <a
+            href="/custom-look-and-feel/slots/tool-calls-view"
+            className="text-[var(--accent)] underline underline-offset-4"
+          >
+            the tool-calls demo
+          </a>{" "}
+          and ask &quot;What&apos;s the weather in Tokyo?&quot;. Pass: the
+          tool call sits inside a dashed box. Fail: no dashed box (the slot is
+          ignored) or no tool call at all (the agent answered without calling{" "}
+          <code>get_weather</code>). The snippet names no agent, so the demo
+          points it at <code>tool-rendering</code> through a configuration
+          provider (harness glue).
+        </p>
+        <div className="mt-3">
+          <SourceCode file="frontend/src/app/custom-look-and-feel/slots/tool-calls-view/chat.tsx" region="doc" />
+        </div>
+      </Panel>
+
       <Panel title="Available slots">
         <p className="text-sm text-slate-700 dark:text-slate-300">
           On all three chat components:
