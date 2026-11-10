@@ -269,8 +269,8 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Shared State | `/shared-state` | ✅ Working | `set_notes` written to the contract the page describes in prose. |
 | Render state in your app | `/shared-state/rendering-in-app` | ✅ Working | |
 | State Streaming | `/shared-state/streaming` | ✅ Working | |
-| Agent Read-Only Context | `/shared-state/agent-readonly` | ✅ Working | |
-| Readables | `/agent-app-context` | ⚠️ Partial | Covers `impl=graph`, verbatim (model `gpt-6-luna`, see §9 item 3). `impl=prebuilt` (`createAgent` + `copilotkitMiddleware`) documented, not run. |
+| Agent Read-Only Context | `/shared-state/agent-readonly` | ⚠️ Partial | Graph was missing from `langgraph.json` on `main` (route would 404); now the page's Code-tab agent verbatim (`gpt-6-luna`; `makeChatOpenAI` swapped for `chatModel`, §9 item 2). Not yet checked in a browser. |
+| Readables | `/agent-app-context` | ⚠️ Partial | Covers `impl=graph`. `impl=prebuilt` (`createAgent` + `copilotkitMiddleware`) documented, not run. |
 | Reading agent state | `/shared-state/in-app-agent-read` | ✅ Working | |
 | Writing agent state | `/shared-state/in-app-agent-write` | ✅ Working | |
 | Input/Output Schemas | `/shared-state/state-inputs-outputs` | ⚠️ Partial | Doc declares `resources` but never writes or reads it — the internal-state half is this repo's. See §9. |
@@ -381,8 +381,8 @@ The same tab also specifies `model: "openai:gpt-5.4"`. That name is reproduced v
 [Predictive state updates](https://docs.copilotkit.ai/langgraph-typescript/shared-state/predictive-state-updates?agent-type=custom-graph&state-emission=manual-emission) writes `copilotkitEmitState(config, state);` inside a loop. The function is an `AsyncFunction`, the SDK's own docstring for it writes `await copilotkitEmitState(config, { progress: i })`, and the Python tab on the same page writes `await copilotkit_emit_state(...)` — only the TypeScript tab drops it. In this specific example it works, because the `setTimeout(…, 1000)` on the next line gives the promise time to settle, but it is a floating promise: a rejection would be unhandled, and nothing orders the emissions against the sleep. Copy that loop into code without the delay and updates can interleave or be lost. `backend/src/agents/predictive-state-updates-manual.ts` reproduces it as published. The snippet is also a fragment — everything around the loop is elided behind `// ...`, so the surrounding node is this repo's.
 
 
-**18. The Quickstart's TypeScript agent hard-codes `gpt-6-luna`, and its Intelligence key was renamed.**
-[Quickstart](https://docs.copilotkit.ai/langgraph-typescript/quickstart) now has a TypeScript tab (doc-sync 2026-11-09). Its `src/agent.ts` builds `new ChatOpenAI({ modelKwargs: { reasoning_effort: "none" }, model: "gpt-6-luna" })` inline rather than reading a model setting, so `backend/src/agents/quickstart.ts` (verbatim) only answers if your key reaches that model; `OPENAI_MODEL` does not affect it. The runtime snippet now reads `CPK_INTELLIGENCE_API_KEY` (written by `npx copilotkit@latest project select`) instead of `INTELLIGENCE_API_KEY`; `frontend/src/lib/copilot-runtime.ts` reads the new name first and falls back to the old one. The page's FastAPI tab switched from `LangGraphHttpAgent` to `HttpAgent` from `@ag-ui/client`; that tab is Python-only and not exercised here.
+**18. Agent Read-Only Context's chat node type-checks a string branch that can't happen.**
+[Agent Read-Only Context](https://docs.copilotkit.ai/langgraph-typescript/shared-state/agent-readonly) tests `typeof appContext === "string" && appContext.trim() === ""`, but `state.copilotkit.context` is typed as an array of `{ description, value }` entries, so under `strict` the string branch narrows to `never` and `.trim()` is a type error (TS2339). It is harmless at runtime (the branch never runs), and `backend/src/agents/readonly-state-agent-context.ts` keeps it verbatim behind a `@ts-expect-error`. The same Code-tab file exports a `chatNode` built on the public `ChatOpenAI` constructor but wires the graph to a `chatNodeWithHeaders` that uses the unpublished `makeChatOpenAI` (item 2; swapped here for `chatModel` with the same options), so the node the page shows is not the one that runs.
 
 ---
 
@@ -463,7 +463,8 @@ langgraph-typescript/
 │       ├── shared-state-*.ts    # read-write, streaming, language
 │       ├── state-inputs-outputs.ts
 │       ├── predictive-state-updates.ts
-│       ├── readonly-state.ts    # agent-readonly + agent-app-context
+│       ├── readonly-state.ts    # agent-app-context (Readables)
+│       ├── readonly-state-agent-context.ts  # agent-readonly (Code-tab file)
 │       ├── interrupt-flow.ts    # LangGraph interrupt()
 │       ├── subagents.ts         # supervisor + 3 delegation tools
 │       ├── subgraphs.ts         # a compiled graph as a node
