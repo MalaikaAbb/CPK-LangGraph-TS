@@ -201,6 +201,18 @@ export const NAV: NavGroup[] = [
         statusNote:
           "Needs a model that emits reasoning tokens (defaults to o4-mini) AND a verified OpenAI org, since reasoning summaries are gated behind verification — set OPENAI_REASONING_SUMMARY=off if yours is not. Token streaming is disabled here so the trace and the answer stay separate.",
       },
+      {
+        path: "/custom-look-and-feel/markdown",
+        hasDemo: true,
+        agentId: "chat-markdown",
+        title: "Markdown Rendering",
+        docPath: "/langgraph-typescript/custom-look-and-feel/markdown",
+        summary:
+          "The markdownRenderer slot on assistant messages in all three forms: a Streamdown components map, a class string, and a whole replacement component.",
+        status: "partial",
+        statusNote:
+          "Snippets verbatim; route ported from aws-strands-ts. The page defines no CSS for its my-link / my-heading classes, so the first example is only visible in DevTools. Not yet checked in a browser here.",
+      },
     ],
   },
   {
