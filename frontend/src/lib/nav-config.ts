@@ -324,6 +324,28 @@ export const NAV: NavGroup[] = [
           "The Book button is inert: the page notes a2ui.render does not yet accept action_handlers.",
       },
       {
+        path: "/generative-ui/mcp-apps",
+        hasDemo: true,
+        agentId: "mcp_apps",
+        title: "MCP Apps",
+        docPath: "/langgraph-typescript/generative-ui/mcp-apps",
+        summary:
+          "An MCP server's UI resources rendered inline in the chat as sandboxed iframes, wired by the runtime's mcpApps.servers.",
+        status: "partial",
+        statusNote:
+          "The page's Code tab verbatim (agent, runtime route, demo page) pointed at the public Excalidraw MCP server. A minimal ./chat is adapted from the CopilotKit showcase (no suggestion chips); makeChatOpenAI swapped for new ChatOpenAI. Not yet checked in a browser.",
+      },
+      {
+        path: "/generative-ui/open-generative-ui",
+        hasDemo: true,
+        agentId: "open_gen_ui",
+        title: "Open Generative UI",
+        docPath: "/langgraph-typescript/generative-ui/open-generative-ui",
+        summary:
+          "generateSandboxedUi streaming agent-written HTML/CSS/JS into a sandboxed iframe; an advanced variant adds sandbox functions that call back into the host.",
+        status: "partial",
+        statusNote:
+          "The page's Code tab verbatim (two agents, runtime route, both demo pages). A minimal ./chat and ./design-skill (feeds the openGenerativeUI.designSkill prop the page teaches) are borrowed from the CopilotKit showcase; all suggestion chips left out; makeChatOpenAI swapped for new ChatOpenAI. Advanced variant at /generative-ui/open-generative-ui/advanced. Not yet checked in a browser.",
         path: "/generative-ui/components",
         hasDemo: true,
         agentId: "genui",

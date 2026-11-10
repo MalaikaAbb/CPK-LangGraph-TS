@@ -26,6 +26,9 @@
     "gen-ui-tool-based": "./src/agents/frontend-tools.ts:genUiToolBasedGraph",
     "a2ui-fixed-schema": "./src/agents/a2ui-fixed.ts:graph",
     "declarative-gen-ui": "./src/agents/declarative-gen-ui.ts:graph",
+    "mcp_apps": "./src/agents/mcp-apps.ts:graph",
+    "open_gen_ui": "./src/agents/open-gen-ui.ts:graph",
+    "open_gen_ui_advanced": "./src/agents/open-gen-ui-advanced.ts:graph",
     "genui": "./src/agents/genui.ts:graph",
 
     "frontend_tools": "./src/agents/frontend-tools.ts:graph",
