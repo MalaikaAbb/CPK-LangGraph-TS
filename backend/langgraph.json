@@ -27,12 +27,14 @@
     "declarative-gen-ui": "./src/agents/declarative-gen-ui.ts:graph",
 
     "frontend_tools": "./src/agents/frontend-tools.ts:graph",
+    "frontend-tools-no-model": "./src/agents/frontend-tools-no-model.ts:graph",
     "hitl-in-chat": "./src/agents/frontend-tools.ts:hitlInChatGraph",
     "interrupt-flow": "./src/agents/interrupt-flow.ts:graph",
 
     "shared-state-read-write": "./src/agents/shared-state-read-write.ts:graph",
     "shared-state-streaming": "./src/agents/shared-state-streaming.ts:graph",
    
+    "readonly-state-agent-context": "./src/agents/readonly-state-agent-context.ts:graph",
     "agent-app-context": "./src/agents/readonly-state.ts:agentAppContextGraph",
     "shared-state-language": "./src/agents/shared-state-language.ts:graph",
     "state-inputs-outputs": "./src/agents/state-inputs-outputs.ts:graph",
