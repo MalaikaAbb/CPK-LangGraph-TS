@@ -491,6 +491,54 @@ export const NAV: NavGroup[] = [
         status: "working",
       },
       {
+        path: "/human-in-the-loop/index",
+        hasDemo: true,
+        agentId: "hitl-in-chat",
+        title: "HITL Overview",
+        docPath: "/langgraph-typescript/human-in-the-loop/index",
+        summary:
+          "The overview's demo: useHumanInTheLoop suspending the run behind an in-chat time picker.",
+        status: "partial",
+        statusNote:
+          "Code tab verbatim (agent, demo page, card); makeChatOpenAI swapped for new ChatOpenAI; the Code tab's showcase route.ts replaced by the main runtime. Not yet checked in a browser.",
+      },
+      {
+        path: "/human-in-the-loop/useInterrupt",
+        hasDemo: true,
+        agentId: "gen-ui-interrupt",
+        title: "Pausing the Agent for Input",
+        docPath: "/langgraph-typescript/human-in-the-loop/useInterrupt",
+        summary:
+          "A backend tool pauses the graph with interrupt(); useInterrupt renders a picker in the chat and resolve() resumes it.",
+        status: "partial",
+        statusNote:
+          "Page excerpts are verbatim @region blocks of the CopilotKit showcase files used here (agent graph assembly and generateFallbackSlots are the showcase's; TimePickerCard is a minimal stand-in; the suggestions hook is not copied). Not yet checked in a browser.",
+      },
+      {
+        path: "/human-in-the-loop/headless",
+        hasDemo: true,
+        agentId: "interrupt-headless",
+        title: "Headless Interrupts",
+        docPath: "/langgraph-typescript/human-in-the-loop/headless",
+        summary:
+          "The same interrupt resolved from the app surface through a hand-rolled useHeadlessInterrupt over useAgent.",
+        status: "partial",
+        statusNote:
+          "Demo is the doc's interrupt-headless file verbatim plus a minimal stand-in for its undefined AppSurface; agent shared with useInterrupt. Not yet checked in a browser.",
+      },
+      {
+        path: "/human-in-the-loop/governed-actions",
+        hasDemo: true,
+        agentId: "governed-actions",
+        title: "Governed Action Approval UI",
+        docPath: "/langgraph-typescript/human-in-the-loop/governed-actions",
+        summary:
+          "Gating a side-effecting tool call behind an approve/reject card before it runs.",
+        status: "partial",
+        statusNote:
+          "Ported from aws-strands-ts. The useHumanInTheLoop approval works in principle; the governance behind it (policy engine, GovernedAction emitter, executeSideEffect) is published nowhere, so verdicts are whatever the model invents. The useInterrupt variant is not built. Not yet checked in a browser.",
+      },
+      {
         path: "/programmatic-control",
         hasDemo: true,
         agentId: "programmatic-control",

@@ -32,8 +32,11 @@
     "genui": "./src/agents/genui.ts:graph",
 
     "frontend_tools": "./src/agents/frontend-tools.ts:graph",
+    "hitl-in-chat": "./src/agents/hitl-in-chat.ts:graph",
+    "governed-actions": "./src/agents/frontend-tools.ts:governedActionsGraph",
+    "gen-ui-interrupt": "./src/agents/interrupt-agent.ts:graph",
+    "interrupt-headless": "./src/agents/interrupt-agent.ts:graph",
     "frontend-tools-no-model": "./src/agents/frontend-tools-no-model.ts:graph",
-    "hitl-in-chat": "./src/agents/frontend-tools.ts:hitlInChatGraph",
     "webmcp": "./src/agents/frontend-tools.ts:webmcpGraph",
     "interrupt-flow": "./src/agents/interrupt-flow.ts:graph",
 

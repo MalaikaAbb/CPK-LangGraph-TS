@@ -100,6 +100,15 @@ export const hitlInChatGraph = buildFrontendToolGraph(
 );
 
 /**
+ * `/human-in-the-loop/governed-actions` — the page publishes only frontend
+ * code (a `useHumanInTheLoop` approval card); any graph that binds the
+ * forwarded frontend tools serves it. Repo-authored.
+ */
+export const governedActionsGraph = buildFrontendToolGraph(
+  "You are an operations assistant. Before any side-effecting action " +
+    "(refunds, deletions, payments), call the approval tool the app registers " +
+    "and wait for the user's decision; report the outcome afterwards.",)
+/**
  * `/webmcp` — the page publishes only frontend code (`useFrontendTool` for
  * `search_orders`, mirrored to `document.modelContext`). Any graph that binds
  * the forwarded frontend tools serves it; this one is repo-authored.
