@@ -1,79 +1,55 @@
 import { StateSchema, StateGraph } from "@langchain/langgraph";
 import { RunnableConfig } from "@langchain/core/runnables";
+import { CopilotKitStateSchema } from "@copilotkit/sdk-js/langgraph";
+// #region inject-context
+// Verbatim from https://docs.copilotkit.ai/langgraph-typescript/agent-app-context?impl=graph
+// ("agent-js/src/agent.ts"). The three imports above are the ones the page's
+// previous step ("Inherit from CopilotKitState") and the code itself rely on
+// but this block does not repeat.
 import { SystemMessage } from "@langchain/core/messages";
 import { ChatOpenAI } from "@langchain/openai";
-import { CopilotKitStateSchema } from "@copilotkit/sdk-js/langgraph";
 
-/**
- * Agent state
- *
- * Inherits the CopilotKit state properties,
- * including copilotkit.context and messages.
- */
+// add the agent state definition from the previous step
 export const AgentStateSchema = new StateSchema({
+  // ... Your defined state properties
   ...CopilotKitStateSchema.fields,
 });
-
 export type AgentState = typeof AgentStateSchema.State;
 
-/**
- * Chat node
- */
-async function chat_node(
-  state: AgentState,
-  config: RunnableConfig,
-) {
-  // Get CopilotKit context
-  const copilotKitContext = state.copilotkit.context;
+async function chat_node(state: AgentState, config: RunnableConfig) {
+  // Extract the colleagues from CopilotKit context
+  const copilotKitContext = state.copilotkit.context
+  const colleaguesContextItem = copilotKitContext.find(contextItem => contextItem.description === "The current user's colleagues")
 
-  // Find the colleagues context item
-  const colleaguesContextItem = copilotKitContext.find(
-    (contextItem) =>
-      contextItem.description ===
-      "The current user's colleagues",
-  );
+  // The value is a JSON string, so parse it to read the fields
+  const colleagues = colleaguesContextItem ? JSON.parse(colleaguesContextItem.value) : [];
 
-  // The context value is a JSON string,
-  // so parse it before using it.
-  const colleagues = colleaguesContextItem
-    ? JSON.parse(colleaguesContextItem.value)
-    : [];
+  // Now each entry is an object, so colleague.name works
+  // @ts-expect-error doc bug (README §9 item 3): `c` is untyped because JSON.parse returns any — implicit any under strict
+  const colleagueList = colleagues.map((c) => `${c.name} (${c.role})`).join(", ");
 
-  // Convert colleagues into a readable list
-  const colleagueList = colleagues
-    .map(
-      (c: { name: string; role: string }) =>
-        `${c.name} (${c.role})`,
-    )
-    .join(", ");
-
-  // Give the colleagues information to the LLM
+  // Provide the list of colleagues to the LLM
   const systemMessage = new SystemMessage({
     content: `
-You are a helpful assistant that can help emailing colleagues.
-
-The user's colleagues are:
-${colleagueList}
-    `
+      You are a helpful assistant that can help emailing colleagues.
+      The user's colleagues are: ${colleagueList}
+    `,
   });
 
-  // Call the model
-  const response = await new ChatOpenAI({
-    model: "gpt-5.4",
-  }).invoke(
+  const response = await new ChatOpenAI({ modelKwargs: { reasoning_effort: "none" }, model: "gpt-6-luna" }).invoke(
     [systemMessage, ...state.messages],
     config
   );
 
-  // Return updated state
   return {
     ...state,
     messages: response,
   };
 }
+// #endregion
 
 /**
- * Graph
+ * Graph (repo-authored wiring; the page's block ends at the node).
  */
 export const agentAppContextGraph = new StateGraph(AgentStateSchema)
   .addNode("chat_node", chat_node)

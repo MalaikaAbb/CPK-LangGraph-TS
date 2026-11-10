@@ -265,7 +265,7 @@ export const NAV: NavGroup[] = [
           "A named renderer for the get_weather tool, plus the wildcard catch-all from useDefaultRenderTool.",
         status: "partial",
         statusNote:
-          "get_weather only — it is the sole backend tool the page actually defines. search_flights, get_stock_price and roll_dice appear only as renderer props.",
+          "Backend is the page's Code-tab agent with all four tools (get_weather, search_flights, get_stock_price, roll_d20); only get_weather has a named renderer, the rest go through the catch-all. Grouping controls (toolCallDisplay, group: true) not yet checked in a browser.",
       },
       {
         path: "/generative-ui/state-rendering",
@@ -314,7 +314,9 @@ export const NAV: NavGroup[] = [
         docPath: "/langgraph-typescript/frontend-tools",
         summary:
           "A tool the agent calls that executes in the browser and changes the page.",
-        status: "working",
+        status: "partial",
+        statusNote:
+          "Main graph verbatim (gpt-6-luna). New no-model graph (/frontend-tools/no-model) and useFrontendTools list demo (/frontend-tools/tool-list) not yet checked in a browser; the list demo's reports/navigate are repo-authored.",
       },
       {
         path: "/human-in-the-loop",
@@ -462,7 +464,9 @@ export const NAV: NavGroup[] = [
         docPath: "/langgraph-typescript/multi-agent/subagents",
         summary:
           "A supervisor delegating to research, writing and critique sub-agents, with a live delegation log.",
-        status: "working",
+        status: "partial",
+        statusNote:
+          "Backend is the page's Code-tab subagents.ts verbatim. Its append-only delegations reducer contradicts the page's own merge-by-id callout, so the log doubles on a continued thread (README §9 item 19).",
       },
       {
         path: "/subgraphs",
@@ -498,8 +502,10 @@ export const NAV: NavGroup[] = [
         title: "Configurable",
         docPath: "/langgraph-typescript/configurable",
         summary:
-          "Per-run execution parameters that ride on config.configurable and never touch agent state.",
-        status: "working",
+          "Server-owned execution settings: the trusted runtime route sets LangGraph context and recursion_limit; the browser sends none.",
+        status: "partial",
+        statusNote:
+          "The page publishes only a graph.invoke(..., { context, recursionLimit }) fragment. Context schema, node and runtime wiring are repo-authored (README §9 item 18). Not yet checked in a browser.",
       },
     ],
   },

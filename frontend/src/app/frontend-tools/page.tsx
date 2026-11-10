@@ -29,19 +29,56 @@ export default function Page() {
       </Panel>
 
       <Panel title="The demo">
-        <SourceCode file="frontend/src/app/frontend-tools/demo-chat/page.tsx" />
+        <SourceCodeGroup
+          files={[
+            { file: "frontend/src/app/frontend-tools/demo-chat/page.tsx" },
+            { file: "frontend/src/app/frontend-tools/background-chat.tsx" },
+          ]}
+        />
       </Panel>
 
       <Panel
         title="The backend half"
-        description="There is no change_background anywhere in backend/ — and there should not be."
+        description="The page's graph, verbatim: bind whatever the browser registered, per turn."
       >
-        <SourceCodeGroup
-          files={[
-            { file: "backend/src/agents/chat-agents.ts", region: "builders" },
-          ]}
-          note="AGUIToolset() is the whole mechanism: it puts CopilotKit's frontend-tool channel on the model's tool list every turn, so tools registered in React show up server-side without the agent declaring them."
-        />
+        <SourceCode file="backend/src/agents/frontend-tools.ts" region="agent" />
+      </Panel>
+
+      <Panel
+        title="Calling a frontend tool from a node with no model"
+        description="The page's second graph, served as frontend-tools-no-model."
+      >
+        <p className="mb-3 text-sm text-slate-700 dark:text-slate-300">
+          Open{" "}
+          <a href="/frontend-tools/no-model" className="text-[var(--accent)] underline underline-offset-4">
+            the no-model demo
+          </a>{" "}
+          and send any message. Pass: the background turns to the blue-purple
+          gradient and the chat shows &quot;The frontend returned: …&quot;
+          with the handler&apos;s result. Fail: nothing changes (the tool call
+          never reached the browser) or the background keeps being re-requested
+          (the follow-up run was not routed to <code>confirm</code>).
+        </p>
+        <SourceCode file="backend/src/agents/frontend-tools-no-model.ts" region="agent" />
+      </Panel>
+
+      <Panel
+        title="Registering a list of tools"
+        description="useFrontendTools takes an array; tools join and leave as the array changes."
+      >
+        <p className="mb-3 text-sm text-slate-700 dark:text-slate-300">
+          Open{" "}
+          <a href="/frontend-tools/tool-list" className="text-[var(--accent)] underline underline-offset-4">
+            the tool-list demo
+          </a>
+          , ask &quot;open the churn report&quot; while it is not registered,
+          then add it and ask again. Pass: the first attempt finds no tool, the
+          second updates &quot;Last opened&quot; to{" "}
+          <code>/reports/churn</code>. The <code>reports</code> list and{" "}
+          <code>navigate</code> around the snippet are this repo&apos;s; the
+          page does not define them.
+        </p>
+        <SourceCode file="frontend/src/app/frontend-tools/tool-list/page.tsx" region="doc" />
       </Panel>
 
       <Callout tone="info" title="The return value is not decoration">

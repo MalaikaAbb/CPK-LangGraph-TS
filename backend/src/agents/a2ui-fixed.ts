@@ -1,45 +1,43 @@
+// Verbatim from the Code tab of https://docs.copilotkit.ai/langgraph-typescript/generative-ui/a2ui/fixed-schema
+// ("src/agent/a2ui-fixed.ts", doc-sync 2026-11-09). Harness changes: the two
+// `#region` comment markers, and the unpublished `makeChatOpenAI(config, …)`
+// from `./openai-headers` swapped for this repo's `chatModel(…)` (same options;
+// README §9 item 2).
 /**
- * `/generative-ui/a2ui/fixed-schema` — the agent owns the schema, the LLM
- * supplies only data.
+ * LangGraph TypeScript agent for the Declarative Generative UI (A2UI — Fixed Schema) demo.
  *
- * Everything from `CATALOG_ID` down to the `display_flight` tool is published
- * verbatim on the Fixed Schema A2UI page (schema-loading variant, which is the
- * one it lists langgraph-typescript under). The page loads
- * `flight_schema.json` but never prints its contents; the file here is the
- * component tree the page diagrams — Card > Column > [Title, Row(Airport →
- * Arrow → Airport), Row(AirlineBadge · PriceTag), Button] — with the JSON
- * Pointer bindings it describes.
+ * Fixed-schema A2UI: the component tree (schema) is authored ahead of time as
+ * JSON and loaded at startup. The agent only streams *data* into the data model
+ * at runtime. The frontend registers a matching catalog that pins the schema's
+ * component names to real React implementations.
  *
- * `booked_schema.json` sits unused next to it on purpose: the page explains
- * that the "Book" button's optimistic swap needs `action_handlers` on
- * `a2ui.render`, which the SDK does not expose yet. The sibling schema is kept
- * so the swap can be wired the moment it does.
+ * Ported from `src/agents/a2ui_fixed.py`.
  */
+
+import { chatModel } from "./model.js"; // doc: import { makeChatOpenAI } from "./openai-headers";
 
 import { readFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 
 import { z } from "zod";
-import { RunnableConfig } from "@langchain/core/runnables";
+import type { RunnableConfig } from "@langchain/core/runnables";
 import { tool } from "@langchain/core/tools";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
-import { AIMessage, SystemMessage } from "@langchain/core/messages";
+import type { AIMessage } from "@langchain/core/messages";
+import { SystemMessage } from "@langchain/core/messages";
 import {
   MemorySaver,
   START,
   StateGraph,
   Annotation,
 } from "@langchain/langgraph";
-
 import {
   convertActionsToDynamicStructuredTools,
   CopilotKitStateAnnotation,
 } from "@copilotkit/sdk-js/langgraph";
 
-import { chatModel } from "./model.js";
-
-//#region display-flight
+//#region display-flight  [harness marker]
 const CATALOG_ID = "copilotkit://flight-fixed-catalog";
 const SURFACE_ID = "flight-fixed-schema";
 const A2UI_OPERATIONS_KEY = "a2ui_operations";
@@ -79,7 +77,11 @@ function updateComponentsOp(surfaceId: string, components: unknown[]) {
   };
 }
 
-function updateDataModelOp(surfaceId: string, data: unknown, path: string = "/") {
+function updateDataModelOp(
+  surfaceId: string,
+  data: unknown,
+  path: string = "/",
+) {
   return {
     version: "v0.9",
     updateDataModel: { surfaceId, path, value: data },
@@ -120,26 +122,30 @@ const displayFlight = tool(
     }),
   },
 );
-//#endregion
+//#endregion  [harness marker]
 
 const tools = [displayFlight];
 
 const SYSTEM_PROMPT =
-  "You are a flight search assistant. When the user asks about a flight, " +
-  "call `display_flight` with plausible details — the card is drawn from a " +
-  "fixed schema, so you only supply the four data fields. Add one short " +
-  "sentence of context after the card.";
+  "You help users find flights. When asked about a flight, call " +
+  "display_flight with origin, destination, airline, and price. " +
+  "Keep any chat reply to one short sentence.";
 
 async function chatNode(state: AgentState, config: RunnableConfig) {
-  const model = chatModel({ temperature: 0 });
+  const model = chatModel({
+    temperature: 0,
+    model: "gpt-6-luna",
+  });
 
   const modelWithTools = model.bindTools!([
     ...convertActionsToDynamicStructuredTools(state.copilotkit?.actions ?? []),
     ...tools,
   ]);
 
+  const systemMessage = new SystemMessage({ content: SYSTEM_PROMPT });
+
   const response = await modelWithTools.invoke(
-    [new SystemMessage({ content: SYSTEM_PROMPT }), ...state.messages],
+    [systemMessage, ...state.messages],
     config,
   );
 
@@ -148,14 +154,16 @@ async function chatNode(state: AgentState, config: RunnableConfig) {
 
 function shouldContinue({ messages, copilotkit }: AgentState) {
   const lastMessage = messages[messages.length - 1] as AIMessage;
+
   if (lastMessage.tool_calls?.length) {
     const actions = copilotkit?.actions;
-    const hasBackendToolCall = lastMessage.tool_calls.some(
-      (toolCall) =>
-        !actions || actions.every((action) => action.name !== toolCall.name),
-    );
-    if (hasBackendToolCall) return "tool_node";
+    const toolCallName = lastMessage.tool_calls![0].name;
+
+    if (!actions || actions.every((action) => action.name !== toolCallName)) {
+      return "tool_node";
+    }
   }
+
   return "__end__";
 }
 
@@ -164,8 +172,10 @@ const workflow = new StateGraph(AgentStateAnnotation)
   .addNode("tool_node", new ToolNode(tools))
   .addEdge(START, "chat_node")
   .addEdge("tool_node", "chat_node")
-  .addConditionalEdges("chat_node", shouldContinue as never);
+  .addConditionalEdges("chat_node", shouldContinue as any);
 
 const memory = new MemorySaver();
 
-export const graph = workflow.compile({ checkpointer: memory });
+export const graph = workflow.compile({
+  checkpointer: memory,
+});

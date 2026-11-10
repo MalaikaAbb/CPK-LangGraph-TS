@@ -27,6 +27,7 @@
     "declarative-gen-ui": "./src/agents/declarative-gen-ui.ts:graph",
 
     "frontend_tools": "./src/agents/frontend-tools.ts:graph",
+    "frontend-tools-no-model": "./src/agents/frontend-tools-no-model.ts:graph",
     "hitl-in-chat": "./src/agents/frontend-tools.ts:hitlInChatGraph",
     "interrupt-flow": "./src/agents/interrupt-flow.ts:graph",
 
