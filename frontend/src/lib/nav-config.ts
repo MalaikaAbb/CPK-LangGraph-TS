@@ -311,7 +311,7 @@ export const NAV: NavGroup[] = [
           "An agent-emitted { root, elements } spec drawn by @json-render/react against a Zod component catalog.",
         status: "partial",
         statusNote:
-          "The page's full Code tab, verbatim (own runtime route + own <CopilotKit>). makeChatOpenAI borrowed from the showcase. Type-checks; not yet checked in a browser.",
+          "The page's full Code tab, verbatim (own runtime route + own <CopilotKit>). makeChatOpenAI swapped for new ChatOpenAI; suggestion chips not copied. Type-checks; not yet checked in a browser.",
       },
       {
         path: "/generative-ui/hashbrown",
@@ -323,7 +323,7 @@ export const NAV: NavGroup[] = [
           "Streamed structured output parsed progressively by @hashbrownai/react and rendered through a component catalog.",
         status: "partial",
         statusNote:
-          "The page's full Code tab, verbatim, on @hashbrownai 0.7.0 exactly. makeChatOpenAI borrowed from the showcase. Type-checks; not yet checked in a browser.",
+          "The page's full Code tab, verbatim, on @hashbrownai 0.7.0 exactly. makeChatOpenAI swapped for new ChatOpenAI; suggestion chips not copied. Type-checks; not yet checked in a browser.",
       },
     ],
   },

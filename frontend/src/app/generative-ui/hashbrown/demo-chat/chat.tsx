@@ -5,10 +5,11 @@ import {
   CopilotChatAssistantMessage,
 } from "@copilotkit/react-core/v2";
 import { HashBrownRenderMessage } from "./hashbrown-renderer";
-import { useByocHashbrownSuggestions } from "./suggestions";
+// Harness change: the Code tab's suggestion chips (./suggestions) are demo-only and not copied.
+// doc: import { useByocHashbrownSuggestions } from "./suggestions";
 
 export function Chat() {
-  useByocHashbrownSuggestions();
+  // doc: useByocHashbrownSuggestions();
 
   return (
     <CopilotChat

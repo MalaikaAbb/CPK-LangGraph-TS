@@ -29,9 +29,11 @@ export default function Page() {
           <code>src/app/demos/declarative-hashbrown/</code> to{" "}
           <code>demo-chat/</code>. <code>@hashbrownai/core</code> and{" "}
           <code>/react</code> are pinned to exactly <code>0.7.0</code>, because
-          the code uses APIs that 0.8 removed. The agent&apos;s{" "}
-          <code>makeChatOpenAI</code> is borrowed from the CopilotKit showcase
-          (README §9 item 2).
+          the code uses APIs that 0.8 removed. Not copied: the Code
+          tab&apos;s suggestion chips, and its unpublished{" "}
+          <code>makeChatOpenAI</code> helper, which is swapped for{" "}
+          <code>new ChatOpenAI(…)</code> with the same options (README §9 item
+          2).
         </p>
       </Callout>
 

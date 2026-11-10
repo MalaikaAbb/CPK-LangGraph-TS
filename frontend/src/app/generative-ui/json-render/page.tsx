@@ -31,9 +31,11 @@ export default function Page() {
           from <code>src/app/demos/declarative-json-render/</code> to{" "}
           <code>demo-chat/</code>. The demo mounts its own{" "}
           <code>&lt;CopilotKit&gt;</code> against a dedicated single-route
-          runtime (<code>/api/copilotkit-declarative-json-render</code>). The
-          agent imports <code>makeChatOpenAI</code>, which is borrowed from the
-          CopilotKit showcase (README §9 item 2).
+          runtime (<code>/api/copilotkit-declarative-json-render</code>). Not
+          copied: the Code tab&apos;s suggestion chips, and its unpublished{" "}
+          <code>makeChatOpenAI</code> helper, which is swapped for{" "}
+          <code>new ChatOpenAI(…)</code> with the same options (README §9 item
+          2).
         </p>
       </Callout>
 
