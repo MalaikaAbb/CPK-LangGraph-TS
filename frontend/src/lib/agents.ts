@@ -27,6 +27,7 @@ export const AGENT_IDS = [
   // Custom look and feel
   "chat-customization-css",
   "chat-slots",
+  "chat-markdown",
   "headless-simple",
   "headless-complete",
   "reasoning-default",
@@ -44,6 +45,7 @@ export const AGENT_IDS = [
 
   // App control
   "frontend_tools",
+  "frontend-tools-no-model",
   "hitl-in-chat",
   "interrupt-flow",
   "programmatic-control",
@@ -98,3 +100,14 @@ export const A2UI_DYNAMIC_AGENT_ID = "declarative-gen-ui";
 
 /** The agent the voice route's dedicated runtime serves. */
 export const VOICE_AGENT_ID = "voice-demo";
+
+/** The agent whose runtime entry carries server-owned execution settings. */
+export const CONFIGURABLE_AGENT_ID = "configurable";
+
+/**
+ * Stands in for "the tenant resolved after authentication" on the Configurable
+ * route. A real app derives it from a validated request, per the page; this
+ * harness has no auth, so it is a server-side env var with a demo default.
+ */
+export const CONFIGURABLE_TENANT_ID =
+  process.env.CONFIGURABLE_TENANT_ID ?? "tenant-demo";

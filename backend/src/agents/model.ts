@@ -47,8 +47,12 @@ export const REASONING_MODEL = process.env.OPENAI_REASONING_MODEL ?? "o4-mini";
  * `type` keys, invents component names, and nests children inline, none of
  * which the renderer can resolve.
  *
- * The Dynamic Schema page builds its A2UI generation model as
- * `ChatOpenAI(model="gpt-4o")`, so that is the default here too.
+ * The Dynamic Schema page used to build its A2UI generation model as
+ * `ChatOpenAI(model="gpt-4o")`, which is where this default came from. Since
+ * doc-sync 2026-11-09 that (Python-only, opt-out) snippet says
+ * `ChatOpenAI(model="gpt-6-luna", reasoning_effort="none")`. This repo doesn't
+ * run that snippet (README §9 item 12), so the default stays `gpt-4o`. Set
+ * OPENAI_A2UI_MODEL to try the page's model.
  */
 export const A2UI_MODEL = process.env.OPENAI_A2UI_MODEL ?? "gpt-4o";
 

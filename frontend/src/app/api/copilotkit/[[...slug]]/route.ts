@@ -4,6 +4,8 @@ import { LangGraphAgent } from "@copilotkit/runtime/langgraph";
 import {
   AGENT_IDS,
   A2UI_FIXED_AGENT_ID,
+  CONFIGURABLE_AGENT_ID,
+  CONFIGURABLE_TENANT_ID,
   LANGGRAPH_URL,
   LANGSMITH_API_KEY,
 } from "@/lib/agents";
@@ -53,6 +55,20 @@ const handler = createCopilotRuntimeHandler({
           deploymentUrl: LANGGRAPH_URL,
           graphId,
           langsmithApiKey: LANGSMITH_API_KEY,
+          // Configurable page: execution settings come from the trusted
+          // server, never the browser. `@ag-ui/langgraph` sends any
+          // `configurable` key that the graph's context schema declares as
+          // LangGraph `context`, and passes `recursion_limit` through as an
+          // execution setting. Repo glue — the page shows only a direct
+          // `graph.invoke(input, { context, recursionLimit })`.
+          ...(graphId === CONFIGURABLE_AGENT_ID
+            ? {
+                assistantConfig: {
+                  configurable: { tenantId: CONFIGURABLE_TENANT_ID },
+                  recursion_limit: 50,
+                },
+              }
+            : {}),
         }),
       ]),
     ),

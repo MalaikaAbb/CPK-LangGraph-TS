@@ -67,7 +67,7 @@ export function IntelligenceStatus() {
             />,
           ],
           [
-            "INTELLIGENCE_API_KEY",
+            "CPK_INTELLIGENCE_API_KEY",
             <Pill
               key="key"
               on={INTELLIGENCE_ENABLED}
@@ -122,7 +122,7 @@ export function IntelligenceStatus() {
           </>
         ) : (
           <>
-            No <code>INTELLIGENCE_API_KEY</code>, so the runtime is in SSE mode
+            No <code>CPK_INTELLIGENCE_API_KEY</code>, so the runtime is in SSE mode
             with an in-memory runner. Every chat route in this harness still
             works; the three Rich Threads routes have nothing durable to list.
             Set the key in <code>frontend/.env.local</code> and restart to
