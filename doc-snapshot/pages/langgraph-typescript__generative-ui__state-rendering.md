@@ -46,6 +46,45 @@ that as middleware; direct SDK adapters can emit `STATE_SNAPSHOT` events from
 their streaming loop. Either way, the UI can watch the answer assemble
 token-by-token rather than appearing in one burst between checkpoints.
 
+<Steps>
+  <Step>
+    ### Install the CopilotKit LangGraph SDK
+
+    ```bash
+    npm install @copilotkit/sdk-js
+    ```
+
+  </Step>
+  <Step>
+    ### Map generated content into shared state while it streams
+
+    Extend your graph state with `CopilotKitStateAnnotation`, then call
+    `copilotkitCustomizeConfig` with an `emitIntermediateState` mapping. This
+    forwards the `write_document.document` tool argument into `state.document`
+    while the model is still generating it.
+
+    
+~~~~typescript title="shared-state-streaming.ts"
+  const streamingConfig = copilotkitCustomizeConfig(config, {
+    emitIntermediateState: [
+      {
+        stateKey: "document",
+        tool: "write_document",
+        toolArgument: "document",
+      },
+    ],
+  });
+
+  const response = await modelWithTools.invoke(
+    [systemMessage, ...state.messages],
+    streamingConfig,
+  );
+~~~~
+
+
+  </Step>
+</Steps>
+
 ```typescript
 // src/agent/shared-state-streaming.ts
   const streamingConfig = copilotkitCustomizeConfig(config, {

@@ -54,12 +54,10 @@ around a real backend tool, see [Tool rendering](/langgraph-typescript/generativ
 
     
 ~~~~typescript title="frontend-tools.ts"
-import { RunnableConfig } from "@langchain/core/runnables";
+import type { RunnableConfig } from "@langchain/core/runnables";
 import { SystemMessage } from "@langchain/core/messages";
 import { MemorySaver, START, StateGraph } from "@langchain/langgraph";
 import { ChatOpenAI } from "@langchain/openai";
-import { makeChatOpenAI } from "./openai-headers";
-
 import {
   convertActionsToDynamicStructuredTools,
   CopilotKitStateAnnotation,
@@ -75,12 +73,11 @@ export type AgentState = typeof AgentStateAnnotation.State;
 
 const SYSTEM_PROMPT = "You are a helpful, concise assistant.";
 
-async function chatNode(state: AgentState, config: RunnableConfig) {
-  const model = makeChatOpenAI(config, {
-    temperature: 0,
-    model: "gpt-4o-mini",
-  });
-
+async function runChatNode(
+  state: AgentState,
+  config: RunnableConfig,
+  model: ChatOpenAI,
+) {
   const modelWithTools = model.bindTools!([
     ...convertActionsToDynamicStructuredTools(state.copilotkit?.actions ?? []),
   ]);
@@ -93,26 +90,118 @@ async function chatNode(state: AgentState, config: RunnableConfig) {
   return { messages: response };
 }
 
-const workflow = new StateGraph(AgentStateAnnotation)
-  .addNode("chat_node", chatNode)
-  .addEdge(START, "chat_node")
-  .addEdge("chat_node", "__end__");
+async function chatNode(state: AgentState, config: RunnableConfig) {
+  return runChatNode(
+    state,
+    config,
+    new ChatOpenAI({
+      modelKwargs: { reasoning_effort: "none" },
+      temperature: 0,
+      model: "gpt-6-luna",
+    }),
+  );
+}
 
-const memory = new MemorySaver();
+function compileGraph(node: typeof chatNode) {
+  return new StateGraph(AgentStateAnnotation)
+    .addNode("chat_node", node)
+    .addEdge(START, "chat_node")
+    .addEdge("chat_node", "__end__")
+    .compile({ checkpointer: new MemorySaver() });
+}
 
-export const graph = workflow.compile({
-  checkpointer: memory,
-});
+export const graph = compileGraph(chatNode);
 ~~~~
 
 
   </Step>
+  <Step>
+    ### Call a frontend tool from a node with no model
+
+    A node does not need a model to call a frontend tool. Return an
+    `AIMessage` with a `tool_calls` entry. This example calls the
+    `change_background` tool that the frontend above registers. When the run
+    ends, CopilotKit runs the matching `useFrontendTool` handler in the
+    browser. Then it starts a follow-up run with the result as a
+    `ToolMessage`. Route that run to a node that reads the result, so the
+    graph does not call the tool again:
+
+    ```ts title="src/agent.ts"
+    import { randomUUID } from "node:crypto";
+    import { AIMessage, ToolMessage } from "@langchain/core/messages";
+    import { END, START, StateGraph } from "@langchain/langgraph";
+    import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langgraph";
+
+    type AgentState = typeof CopilotKitStateAnnotation.State;
+
+    // Ask the frontend to run `change_background`. No model call.
+    async function requestBackground(state: AgentState) {
+      return {
+        messages: [
+          new AIMessage({
+            content: "",
+            tool_calls: [
+              {
+                id: randomUUID(),
+                name: "change_background",
+                args: { background: "linear-gradient(135deg, #1e3a8a, #9333ea)" },
+                type: "tool_call",
+              },
+            ],
+          }),
+        ],
+      };
+    }
+
+    // Runs on the follow-up run, after the frontend returns the tool result.
+    async function confirm(state: AgentState) {
+      const result = state.messages.at(-1);
+      return {
+        messages: [new AIMessage(`The frontend returned: ${result?.content}`)],
+      };
+    }
+
+    export const graph = new StateGraph(CopilotKitStateAnnotation)
+      .addNode("request_background", requestBackground)
+      .addNode("confirm", confirm)
+      .addConditionalEdges(START, (state: AgentState) => {
+        const last = state.messages.at(-1);
+        return last && ToolMessage.isInstance(last)
+          ? "confirm"
+          : "request_background";
+      })
+      .addEdge("request_background", END)
+      .addEdge("confirm", END)
+      .compile();
+    ```
+
+    The tool call must be in the graph state. `copilotkitEmitToolCall` alone
+    only streams the call. At the end of the run, the messages from the graph
+    state replace the streamed ones, so the handler never runs.
+
+  </Step>
 </Steps>
+
+Import the React hook and Zod in the component that registers the tool. This also
+applies to the built-in agent, which needs no backend tool-registration step.
+
+```tsx
+import { useComponent } from "@copilotkit/react-core/v2";
+import { z } from "zod";
+```
 
 `useComponent` takes a name, a Zod schema for its props, and the component
 to render. The runtime registers it as a frontend tool so the agent can
-discover it, and Zod validates the LLM's arguments before they reach your
-component.
+discover it, and the schema becomes that tool's parameter definition — it is
+what tells the model which arguments to send.
+
+<Callout type="warn">
+  `parameters` is optional, but leaving it out advertises the tool with an
+  empty parameter schema (`{ "type": "object", "properties": {} }`). The model
+  then has nothing to fill in, so it calls the tool with no arguments and your
+  component renders with no props. Pass a schema for any component that needs
+  data.
+</Callout>
 
 ```typescript
 // src/app/demos/gen-ui-tool-based/page.tsx
@@ -134,5 +223,26 @@ anything about CopilotKit.
   name. Make it a verb like `render_bar_chart` or `show_weather` so the LLM
   reliably picks it when the user asks for that visualization.
 </Callout>
+
+## Rendering in a headless chat
+
+CopilotKit's built-in chat components paint registered components for you. A
+headless or custom chat renders the message list itself, so nothing paints a
+tool call unless you render it — the component is registered and the agent
+calls it, but the chat stays empty.
+
+Render the tool calls on each assistant message with
+`CopilotChatToolCallsView`:
+
+```tsx
+import { CopilotChatToolCallsView } from "@copilotkit/react-core/v2";
+
+<CopilotChatToolCallsView message={assistantMessage} messages={allMessages} />;
+```
+
+It looks up the sibling `tool`-role message for each tool call and hands both
+to the registered renderer. For finer placement, call `useRenderToolCall()` and
+paint each tool call yourself — see
+[Headless UI](/langgraph-typescript/custom-look-and-feel/headless-ui).
 
 <IntegrationGrid path="generative-ui/tool-based" />

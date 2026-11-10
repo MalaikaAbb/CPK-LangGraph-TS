@@ -63,12 +63,10 @@ Use HITL when you need:
 
     
 ~~~~typescript title="frontend-tools.ts"
-import { RunnableConfig } from "@langchain/core/runnables";
+import type { RunnableConfig } from "@langchain/core/runnables";
 import { SystemMessage } from "@langchain/core/messages";
 import { MemorySaver, START, StateGraph } from "@langchain/langgraph";
 import { ChatOpenAI } from "@langchain/openai";
-import { makeChatOpenAI } from "./openai-headers";
-
 import {
   convertActionsToDynamicStructuredTools,
   CopilotKitStateAnnotation,
@@ -84,12 +82,11 @@ export type AgentState = typeof AgentStateAnnotation.State;
 
 const SYSTEM_PROMPT = "You are a helpful, concise assistant.";
 
-async function chatNode(state: AgentState, config: RunnableConfig) {
-  const model = makeChatOpenAI(config, {
-    temperature: 0,
-    model: "gpt-4o-mini",
-  });
-
+async function runChatNode(
+  state: AgentState,
+  config: RunnableConfig,
+  model: ChatOpenAI,
+) {
   const modelWithTools = model.bindTools!([
     ...convertActionsToDynamicStructuredTools(state.copilotkit?.actions ?? []),
   ]);
@@ -102,16 +99,27 @@ async function chatNode(state: AgentState, config: RunnableConfig) {
   return { messages: response };
 }
 
-const workflow = new StateGraph(AgentStateAnnotation)
-  .addNode("chat_node", chatNode)
-  .addEdge(START, "chat_node")
-  .addEdge("chat_node", "__end__");
+async function chatNode(state: AgentState, config: RunnableConfig) {
+  return runChatNode(
+    state,
+    config,
+    new ChatOpenAI({
+      modelKwargs: { reasoning_effort: "none" },
+      temperature: 0,
+      model: "gpt-6-luna",
+    }),
+  );
+}
 
-const memory = new MemorySaver();
+function compileGraph(node: typeof chatNode) {
+  return new StateGraph(AgentStateAnnotation)
+    .addNode("chat_node", node)
+    .addEdge(START, "chat_node")
+    .addEdge("chat_node", "__end__")
+    .compile({ checkpointer: new MemorySaver() });
+}
 
-export const graph = workflow.compile({
-  checkpointer: memory,
-});
+export const graph = compileGraph(chatNode);
 ~~~~
 
 

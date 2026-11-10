@@ -55,12 +55,12 @@ canonical example.
 ~~~~typescript title="subagents.ts"
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { RunnableConfig } from "@langchain/core/runnables";
+import type { RunnableConfig } from "@langchain/core/runnables";
 import { tool } from "@langchain/core/tools";
 import type { ToolRunnableConfig } from "@langchain/core/tools";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
+import type { AIMessage } from "@langchain/core/messages";
 import {
-  AIMessage,
   HumanMessage,
   SystemMessage,
   ToolMessage,
@@ -73,7 +73,6 @@ import {
   StateGraph,
 } from "@langchain/langgraph";
 import { ChatOpenAI } from "@langchain/openai";
-import { makeChatOpenAI } from "./openai-headers";
 import {
   convertActionsToDynamicStructuredTools,
   CopilotKitStateAnnotation,
@@ -133,15 +132,22 @@ const SUB_AGENT_PROMPTS: Record<SubAgentName, string> = {
     "2-3 crisp, actionable critiques. No preamble.",
 };
 
+type ModelFactory = (config?: RunnableConfig) => ChatOpenAI;
+
+const defaultModelFactory: ModelFactory = () =>
+  new ChatOpenAI({
+    temperature: 0,
+    model: "gpt-6-luna",
+    modelKwargs: { reasoning_effort: "none" },
+  });
+
 async function invokeSubAgent(
   agent: SubAgentName,
   task: string,
   config?: RunnableConfig,
+  modelFactory: ModelFactory = defaultModelFactory,
 ): Promise<string> {
-  const subModel = makeChatOpenAI(config, {
-    temperature: 0,
-    model: "gpt-4o-mini",
-  });
+  const subModel = modelFactory(config);
   const result = await subModel.invoke([
     new SystemMessage({ content: SUB_AGENT_PROMPTS[agent] }),
     new HumanMessage({ content: task }),
@@ -176,12 +182,12 @@ supervisor; the supervisor only ever sees what the sub-agent returns.
 // src/agent/subagents.ts
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { RunnableConfig } from "@langchain/core/runnables";
+import type { RunnableConfig } from "@langchain/core/runnables";
 import { tool } from "@langchain/core/tools";
 import type { ToolRunnableConfig } from "@langchain/core/tools";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
+import type { AIMessage } from "@langchain/core/messages";
 import {
-  AIMessage,
   HumanMessage,
   SystemMessage,
   ToolMessage,
@@ -194,7 +200,6 @@ import {
   StateGraph,
 } from "@langchain/langgraph";
 import { ChatOpenAI } from "@langchain/openai";
-import { makeChatOpenAI } from "./openai-headers";
 import {
   convertActionsToDynamicStructuredTools,
   CopilotKitStateAnnotation,
@@ -254,15 +259,22 @@ const SUB_AGENT_PROMPTS: Record<SubAgentName, string> = {
     "2-3 crisp, actionable critiques. No preamble.",
 };
 
+type ModelFactory = (config?: RunnableConfig) => ChatOpenAI;
+
+const defaultModelFactory: ModelFactory = () =>
+  new ChatOpenAI({
+    temperature: 0,
+    model: "gpt-6-luna",
+    modelKwargs: { reasoning_effort: "none" },
+  });
+
 async function invokeSubAgent(
   agent: SubAgentName,
   task: string,
   config?: RunnableConfig,
+  modelFactory: ModelFactory = defaultModelFactory,
 ): Promise<string> {
-  const subModel = makeChatOpenAI(config, {
-    temperature: 0,
-    model: "gpt-4o-mini",
-  });
+  const subModel = modelFactory(config);
   const result = await subModel.invoke([
     new SystemMessage({ content: SUB_AGENT_PROMPTS[agent] }),
     new HumanMessage({ content: task }),
@@ -303,115 +315,6 @@ wrapper around a specialized agent call that:
 
 ```typescript
 // src/agent/subagents.ts
-import { randomUUID } from "node:crypto";
-import { z } from "zod";
-import { RunnableConfig } from "@langchain/core/runnables";
-import { tool } from "@langchain/core/tools";
-import type { ToolRunnableConfig } from "@langchain/core/tools";
-import { ToolNode } from "@langchain/langgraph/prebuilt";
-import {
-  AIMessage,
-  HumanMessage,
-  SystemMessage,
-  ToolMessage,
-} from "@langchain/core/messages";
-import {
-  Annotation,
-  Command,
-  MemorySaver,
-  START,
-  StateGraph,
-} from "@langchain/langgraph";
-import { ChatOpenAI } from "@langchain/openai";
-import { makeChatOpenAI } from "./openai-headers";
-import {
-  convertActionsToDynamicStructuredTools,
-  CopilotKitStateAnnotation,
-} from "@copilotkit/sdk-js/langgraph";
-
-// ---------------------------------------------------------------------------
-// 1. Shared state — `delegations` is rendered as a live log in the UI.
-// ---------------------------------------------------------------------------
-
-export type SubAgentName =
-  | "research_agent"
-  | "writing_agent"
-  | "critique_agent";
-
-export interface Delegation {
-  id: string;
-  sub_agent: SubAgentName;
-  task: string;
-  status: "running" | "completed" | "failed";
-  result: string;
-}
-
-const AgentStateAnnotation = Annotation.Root({
-  ...CopilotKitStateAnnotation.spec,
-  // Use a list-extending reducer so parallel tool_calls in a single
-  // assistant turn don't clobber each other. Without this, each tool
-  // callback's Command runs against the same task-input snapshot, and the
-  // channel reducer (last-write-wins by default) silently drops every
-  // delegation but one.
-  delegations: Annotation<Delegation[]>({
-    reducer: (a, b) => [...(a ?? []), ...(b ?? [])],
-    default: () => [],
-  }),
-});
-
-export type AgentState = typeof AgentStateAnnotation.State;
-
-// ---------------------------------------------------------------------------
-// 2. Sub-agents (small purpose-built LLM invocations).
-//
-// Each sub-agent has its own system prompt and is invoked synchronously
-// from inside the matching supervisor tool. They don't share memory or
-// tools with the supervisor — the supervisor only sees their return
-// value.
-// ---------------------------------------------------------------------------
-
-const SUB_AGENT_PROMPTS: Record<SubAgentName, string> = {
-  research_agent:
-    "You are a research sub-agent. Given a topic, produce a concise " +
-    "bulleted list of 3-5 key facts. No preamble, no closing.",
-  writing_agent:
-    "You are a writing sub-agent. Given a brief and optional source " +
-    "facts, produce a polished 1-paragraph draft. Be clear and " +
-    "concrete. No preamble.",
-  critique_agent:
-    "You are an editorial critique sub-agent. Given a draft, give " +
-    "2-3 crisp, actionable critiques. No preamble.",
-};
-
-async function invokeSubAgent(
-  agent: SubAgentName,
-  task: string,
-  config?: RunnableConfig,
-): Promise<string> {
-  const subModel = makeChatOpenAI(config, {
-    temperature: 0,
-    model: "gpt-4o-mini",
-  });
-  const result = await subModel.invoke([
-    new SystemMessage({ content: SUB_AGENT_PROMPTS[agent] }),
-    new HumanMessage({ content: task }),
-  ]);
-  const content = (result as AIMessage).content;
-  if (typeof content === "string") return content;
-  // Content is sometimes a list of parts — flatten any text parts.
-  if (Array.isArray(content)) {
-    return content
-      .map((part) =>
-        typeof part === "string"
-          ? part
-          : "text" in (part as Record<string, unknown>)
-            ? String((part as { text?: unknown }).text ?? "")
-            : "",
-      )
-      .join("");
-  }
-  return String(content ?? "");
-}
 
 // ---------------------------------------------------------------------------
 // 3. Helper — emit a single delegation entry plus a ToolMessage.
@@ -462,9 +365,10 @@ async function runSubAgentSafely(
   agent: SubAgentName,
   task: string,
   config?: RunnableConfig,
+  modelFactory: ModelFactory = defaultModelFactory,
 ): Promise<{ ok: true; result: string } | { ok: false; result: string }> {
   try {
-    const result = await invokeSubAgent(agent, task, config);
+    const result = await invokeSubAgent(agent, task, config, modelFactory);
     return { ok: true, result };
   } catch (err) {
     const errName = err instanceof Error ? err.constructor.name : typeof err;
@@ -499,91 +403,80 @@ function requireToolCallId(
 // ToolMessage the supervisor can read on its next step.
 // ---------------------------------------------------------------------------
 
-const researchAgentTool = tool(
-  async ({ task }, config: ToolRunnableConfig) => {
-    const toolCallId = requireToolCallId(config, "research_agent");
-    const outcome = await runSubAgentSafely("research_agent", task, config);
-    return delegationUpdate(
+function createSubAgentTool(
+  agent: SubAgentName,
+  description: string,
+  taskDescription: string,
+  modelFactory: ModelFactory = defaultModelFactory,
+) {
+  return tool(
+    async ({ task }, config: ToolRunnableConfig) => {
+      const toolCallId = requireToolCallId(config, agent);
+      const outcome = await runSubAgentSafely(
+        agent,
+        task,
+        config,
+        modelFactory,
+      );
+      return delegationUpdate(
+        agent,
+        task,
+        outcome.result,
+        toolCallId,
+        outcome.ok ? "completed" : "failed",
+      );
+    },
+    {
+      name: agent,
+      description,
+      schema: z.object({ task: z.string().describe(taskDescription) }),
+    },
+  );
+}
+
+function createSubAgentTools(modelFactory: ModelFactory = defaultModelFactory) {
+  return [
+    createSubAgentTool(
       "research_agent",
-      task,
-      outcome.result,
-      toolCallId,
-      outcome.ok ? "completed" : "failed",
-    );
-  },
-  {
-    name: "research_agent",
-    description:
       "Delegate a research task to the research sub-agent. " +
-      "Use for: gathering facts, background, definitions, statistics. " +
-      "Returns a bulleted list of key facts.",
-    schema: z.object({
-      task: z
-        .string()
-        .describe("The research question or topic to investigate."),
-    }),
-  },
-);
-
-const writingAgentTool = tool(
-  async ({ task }, config: ToolRunnableConfig) => {
-    const toolCallId = requireToolCallId(config, "writing_agent");
-    const outcome = await runSubAgentSafely("writing_agent", task, config);
-    return delegationUpdate(
+        "Use for: gathering facts, background, definitions, statistics. " +
+        "Returns a bulleted list of key facts.",
+      "The research question or topic to investigate.",
+      modelFactory,
+    ),
+    createSubAgentTool(
       "writing_agent",
-      task,
-      outcome.result,
-      toolCallId,
-      outcome.ok ? "completed" : "failed",
-    );
-  },
-  {
-    name: "writing_agent",
-    description:
       "Delegate a drafting task to the writing sub-agent. " +
-      "Use for: producing a polished paragraph, draft, or summary. Pass " +
-      "relevant facts from prior research inside `task`.",
-    schema: z.object({
-      task: z
-        .string()
-        .describe(
-          "Brief + optional source facts. The sub-agent returns a 1-paragraph draft.",
-        ),
-    }),
-  },
-);
-
-const critiqueAgentTool = tool(
-  async ({ task }, config: ToolRunnableConfig) => {
-    const toolCallId = requireToolCallId(config, "critique_agent");
-    const outcome = await runSubAgentSafely("critique_agent", task, config);
-    return delegationUpdate(
+        "Use for: producing a polished paragraph, draft, or summary. Pass " +
+        "relevant facts from prior research inside `task`.",
+      "Brief + optional source facts. The sub-agent returns a 1-paragraph draft.",
+      modelFactory,
+    ),
+    createSubAgentTool(
       "critique_agent",
-      task,
-      outcome.result,
-      toolCallId,
-      outcome.ok ? "completed" : "failed",
-    );
-  },
-  {
-    name: "critique_agent",
-    description:
       "Delegate a critique task to the critique sub-agent. " +
-      "Use for: reviewing a draft and suggesting concrete improvements.",
-    schema: z.object({
-      task: z
-        .string()
-        .describe(
-          "The draft to critique. The sub-agent returns 2-3 critiques.",
-        ),
-    }),
-  },
-);
+        "Use for: reviewing a draft and suggesting concrete improvements.",
+      "The draft to critique. The sub-agent returns 2-3 critiques.",
+      modelFactory,
+    ),
+  ];
+}
+
+const tools = createSubAgentTools();
 ```
 
 This is where CopilotKit's shared-state channel earns its keep: the
 supervisor's tool calls mutate `delegations` as they happen, and the
 frontend renders every new entry live.
+
+<Callout type="warn">
+  Give every delegation a stable `id` and merge new entries by that `id`. The
+  client sends its copy of shared state back as run input on every run, so a
+  slot that blindly appends whatever it receives — a LangGraph
+  `Annotated[list, operator.add]` reducer, for example — concatenates the
+  entries the client just echoed onto the ones the agent already has, and the
+  log doubles when a thread is continued.
+</Callout>
 
 ## Rendering a live delegation log
 
