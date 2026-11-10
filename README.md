@@ -177,7 +177,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Route | Demonstrates | Try | Pass / Fail |
 |---|---|---|---|
 | `/custom-look-and-feel/css` | Re-skinning via v2 shadcn tokens and `.copilotKit*` class hooks, scoped to a wrapper. | Send two messages. | **Pass:** warm parchment theme, user bubbles are monospace with a `→` marker. **Fail:** default theme → `theme.css` was not imported by the route. |
-| `/custom-look-and-feel/slots` | Three override levels: class string, props object, whole component. | Look before and after the first message. | **Pass:** custom welcome screen, tinted assistant card with a "slot" badge, tagged disclaimer. **Fail:** default welcome screen → the `welcomeScreen` prop is not landing. |
+| `/custom-look-and-feel/slots` | Three override levels: class string, props object, whole component; plus the `toolCallsView` sub-slot demo at `/custom-look-and-feel/slots/tool-calls-view`. | Look before and after the first message. On the tool-calls demo ask "What's the weather in Tokyo?". | **Pass:** custom welcome screen, tinted assistant card with a "slot" badge, tagged disclaimer; on the tool-calls demo the call is inside a dashed box. **Fail:** default welcome screen → the `welcomeScreen` prop is not landing; no dashed box → `toolCallsView` ignored. |
 | `/custom-look-and-feel/headless-ui` | A chat with no CopilotKit chrome — `useAgent` + `useCopilotKit` only. | Send a message. | **Pass:** hand-rolled bubbles stream. **Fail:** nothing sends → `runAgent` was not called after `addMessage`. |
 | `/custom-look-and-feel/reasoning-messages` | The built-in reasoning card and its `header` / `contentView` sub-slots. | "A bat and ball cost $1.10 in total…" | **Pass:** a card with custom header and monospace content, collapsing to "Thought for N seconds". It arrives in chunks, not per token — streaming is off on this graph by design (§9). **Fail:** no card → the model emitted no reasoning tokens. |
 
@@ -203,7 +203,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 
 | Route | Demonstrates | Try | Pass / Fail |
 |---|---|---|---|
-| `/frontend-tools` | A tool that executes in the browser and changes the page. | "Make the background a sunset gradient" | **Pass:** the page background changes. **Fail:** the agent describes a gradient in prose. |
+| `/frontend-tools` | A tool that executes in the browser and changes the page; plus a no-model graph that emits the tool call itself (`/frontend-tools/no-model`) and `useFrontendTools` over a changing list (`/frontend-tools/tool-list`). | "Make the background a sunset gradient"; on no-model send anything; on tool-list ask "open the churn report" before and after adding it. | **Pass:** the background changes; no-model paints the blue-purple gradient and replies "The frontend returned: …"; tool-list updates "Last opened" only once the tool is registered. **Fail:** the agent describes a gradient in prose; no-model loops or never paints. |
 | `/human-in-the-loop` | `useHumanInTheLoop` suspending the run behind a picker. | "Book an intro call with sales" | **Pass:** picker renders, nothing streams until you pick, then the confirmation names your slot. **Fail:** the run continues under the picker → `respond` was never called. |
 | `/human-in-the-loop/interrupt-flow` | LangGraph's own `interrupt()`, plus two `useInterrupt` hooks split by `enabled`. | "Hello" | **Pass:** an *ask* card, then an *approval* card, then the reply — using the name you typed. Second message: no cards. **Fail:** immediate reply → the `agentId` on the hook does not match the registered id. |
 | `/programmatic-control` | `addMessage`, `runAgent`, `stopAgent`, `subscribe` — no chat component. | Press the run button; press stop mid-run. | **Pass:** messages appear and streaming halts on stop. |
@@ -234,7 +234,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Route | Demonstrates | Try | Pass / Fail |
 |---|---|---|---|
 | `/agent-config` | A typed config object the UI owns, rebuilt into the system prompt each turn. | Set tone → enthusiastic, expertise → beginner; ask "what is a graph?" | **Pass:** the answer's register and depth change to match. |
-| `/configurable` | Per-run `config.configurable` that never touches agent state. | Press **Run with this config**, change `tenantId`, press again. | **Pass:** the reply reports the values back and the new one after the change; none appear in `agent.state`. **Fail:** "no configuration" → `forwardedProps` must nest as `{ config: { configurable: {...} } }`. |
+| `/configurable` | Server-owned execution settings: the runtime route (trusted server) sets `tenantId` as LangGraph `context` and `recursion_limit: 50`; the browser sends neither. | Ask "What tenant and recursion limit did the server give you?" | **Pass:** reply names `tenant-demo` (or `CONFIGURABLE_TENANT_ID`) and 50. **Fail:** tenant `null` → the key is missing from the graph's context schema, so `@ag-ui/langgraph` does not forward it as context. |
 
 ---
 
@@ -245,16 +245,16 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Doc page | Route | Status | Notes |
 |---|---|---|---|
 | Introduction | `/` | ⚪ Reference | Landing page — orientation and live graph roster. |
-| Quickstart | `/quickstart` | ✅ Working | Doc's bring-your-own tab is Python even here; this is that one-node graph in TypeScript. |
+| Quickstart | `/quickstart` | ✅ Working | Graph is the page's new TypeScript `src/agent.ts` verbatim (model `gpt-6-luna`, no checkpointer). Intelligence key is now `CPK_INTELLIGENCE_API_KEY` (old name still read). |
 | CopilotChat | `/prebuilt-components/chat` | ✅ Working | |
 | CopilotSidebar | `/prebuilt-components/sidebar` | ✅ Working | |
 | CopilotPopup | `/prebuilt-components/popup` | ✅ Working | |
 | Open, close, and feedback | `/prebuilt-components/chat-controls` | ✅ Working | |
 | CSS Customization | `/custom-look-and-feel/css` | ✅ Working | |
-| Slots | `/custom-look-and-feel/slots` | ✅ Working | Slot override components are this repo's — the doc declares them as stubs. |
+| Slots | `/custom-look-and-feel/slots` | ✅ Working | Slot override components are this repo's — the doc declares them as stubs. `toolCallsView` snippet is verbatim; pointed at `tool-rendering` by a config provider (not yet checked in a browser). |
 | Headless UI | `/custom-look-and-feel/headless-ui` | ✅ Working | |
 | Reasoning Messages | `/custom-look-and-feel/reasoning-messages` | ⚠️ Partial | Needs a reasoning-token model. Defaults to `o4-mini`; override with `OPENAI_REASONING_MODEL`. Token streaming disabled — see §9. |
-| Multimodal Attachments | `/multimodal-attachments` | ✅ Working | |
+| Multimodal Attachments | `/multimodal-attachments` | ✅ Working | Sets the new `maxConcurrentUploads: 3`; the page's `uploadToStorage` helper is undefined and not copied (§9 item 19). |
 | Voice | `/voice` | ⚠️ Partial | Mic needs `OPENAI_API_KEY` in the Next process. Without it the sample-audio button still drives the route. |
 | Reasoning | `/generative-ui/reasoning` | ⚠️ Partial | Same reasoning-model dependency and disabled token streaming. |
 | Components as Tools | `/generative-ui/tool-based` | ✅ Working | Headless-chat demo is new, not yet checked in a browser. The page's shared `frontend-tools.ts` / no-model graph changes are carried by the Frontend Tools PR. |
@@ -270,15 +270,15 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Render state in your app | `/shared-state/rendering-in-app` | ✅ Working | |
 | State Streaming | `/shared-state/streaming` | ✅ Working | |
 | Agent Read-Only Context | `/shared-state/agent-readonly` | ✅ Working | |
-| Readables | `/agent-app-context` | ⚠️ Partial | Covers `impl=graph`. `impl=prebuilt` (`createAgent` + `copilotkitMiddleware`) documented, not run. |
+| Readables | `/agent-app-context` | ⚠️ Partial | Covers `impl=graph`, verbatim (model `gpt-6-luna`, see §9 item 3). `impl=prebuilt` (`createAgent` + `copilotkitMiddleware`) documented, not run. |
 | Reading agent state | `/shared-state/in-app-agent-read` | ✅ Working | |
 | Writing agent state | `/shared-state/in-app-agent-write` | ✅ Working | |
 | Input/Output Schemas | `/shared-state/state-inputs-outputs` | ⚠️ Partial | Doc declares `resources` but never writes or reads it — the internal-state half is this repo's. See §9. |
 | Predictive state updates | `/shared-state/predictive-state-updates` | ⚠️ Partial | Two tabs, one per `agent-type`. Custom graph works. Prebuilt tab is verbatim including `model: "openai:gpt-5.4"`, so it runs only if your key reaches that model — see §9. |
-| Sub-Agents | `/multi-agent/subagents` | ✅ Working | Supervisor node + graph assembly are this repo's; tools and state are the doc's. |
+| Sub-Agents | `/multi-agent/subagents` | ⚠️ Partial | Backend is the page's Code-tab `subagents.ts` verbatim (model `gpt-6-luna`), minus the unpublished `openai-headers` `showcaseGraph`. Delegation log doubles on a continued thread (§9 item 19). |
 | Subgraphs | `/subgraphs` | ⚠️ Partial | Page publishes only the frontend snippet, so the parent/child graph is this repo's. |
 | Agent Config | `/agent-config` | ✅ Working | Graph published in full; reproduced. |
-| Configurable | `/configurable` | ✅ Working | |
+| Configurable | `/configurable` | ⚠️ Partial | Page now publishes only a `graph.invoke(..., { context, recursionLimit })` fragment; schema, node and runtime wiring are repo-authored (§9 item 18). Not yet checked in a browser. |
 
 **Totals:** 24 ✅ Working · 10 ⚠️ Partial · 1 ⚪ Reference · 0 ❌ Broken · 0 🚧 Not started.
 
@@ -331,8 +331,8 @@ The prop is gone from `CopilotKitProviderProps` and the provider exposes no posi
 **2. `makeChatOpenAI` is imported everywhere and published nowhere.**
 Nearly every LangGraph TypeScript snippet — [Frontend Tools](https://docs.copilotkit.ai/langgraph-typescript/frontend-tools), [Sub-Agents](https://docs.copilotkit.ai/langgraph-typescript/multi-agent/subagents), [Agent Config](https://docs.copilotkit.ai/langgraph-typescript/agent-config), [A2UI Fixed Schema](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/a2ui/fixed-schema) — opens with `import { makeChatOpenAI } from "./openai-headers"`. That module is never shown; it is a private helper in the demo repo the snippets are extracted from. The pages that *don't* use it ([Predictive state updates](https://docs.copilotkit.ai/langgraph-typescript/shared-state/predictive-state-updates), [Interrupts](https://docs.copilotkit.ai/langgraph-typescript/human-in-the-loop/interrupt-flow), [Input/Output Schemas](https://docs.copilotkit.ai/langgraph-typescript/shared-state/state-inputs-outputs)) write `new ChatOpenAI({ model })` inline. This repo uses that second form via `backend/src/agents/model.ts`. Since doc-sync 2026-11-09, `backend/src/agents/a2ui-fixed.ts` and `backend/src/agents/tool-rendering.ts` are their pages' Code-tab files verbatim except for that one import: the Code tab's `makeChatOpenAI(config, opts)` call is swapped for this repo's `chatModel(opts)` with the same options (model literal included). The showcase's `openai-headers.ts` is not copied — it only forwards aimock fixture headers and prints `CVDIAG` diagnostics, and this harness doesn't run aimock.
 
-**3. The Readables TypeScript sample does not compile.**
-[Readables (`impl=graph`)](https://docs.copilotkit.ai/langgraph-typescript/agent-app-context?impl=graph) reads `state.copilotKit.context` with a capital K (the channel is `state.copilotkit`, as every other page has it), matches a description string carrying an unbalanced quote — `'The current user\'s colleagues"'` — and dereferences the `find` result with no null check. The Python tab on the same page is correct. This repo follows the lowercase channel used by Frontend Tools and Read-Only Context.
+**3. The Readables TypeScript sample leaves its map callback untyped, and names a model literal.**
+[Readables (`impl=graph`)](https://docs.copilotkit.ai/langgraph-typescript/agent-app-context?impl=graph) was corrected upstream (doc-sync 2026-11-09): it now reads the lowercase `state.copilotkit.context`, matches the description with a balanced string, and `JSON.parse`s the value, which the page now explains arrives as a JSON string. Two things remain. `colleagues.map((c) => …)` gives `c` no type (`JSON.parse` returns `any`), so it fails under `strict` with an implicit-`any` error; `backend/src/agents/readonly-state.ts` keeps it verbatim behind a `@ts-expect-error`. And the node builds its model as `new ChatOpenAI({ modelKwargs: { reasoning_effort: "none" }, model: "gpt-6-luna" })`; the literal is kept as published, so this route only answers if your key can reach `gpt-6-luna`. The page also gained a "Serve the agent with FastAPI" step, which is Python-only and does not apply to this Node backend.
 
 **4. Two incompatible state-definition dialects across the docs.**
 Some pages use `Annotation.Root({ ...CopilotKitStateAnnotation.spec, … })` ([Frontend Tools](https://docs.copilotkit.ai/langgraph-typescript/frontend-tools), [Shared State](https://docs.copilotkit.ai/langgraph-typescript/shared-state), [Input/Output Schemas](https://docs.copilotkit.ai/langgraph-typescript/shared-state/state-inputs-outputs)); others use `new StateSchema({ …CopilotKitStateSchema.fields })` with zod ([Reading agent state](https://docs.copilotkit.ai/langgraph-typescript/shared-state/in-app-agent-read), [Interrupts](https://docs.copilotkit.ai/langgraph-typescript/human-in-the-loop/interrupt-flow)). Both exist in the SDK, but they do not mix in one graph and no page says which is current. This repo uses the annotation form throughout, because every page with a *complete, runnable* TypeScript graph uses it.
@@ -381,6 +381,9 @@ The same tab also specifies `model: "openai:gpt-5.4"`. That name is reproduced v
 [Predictive state updates](https://docs.copilotkit.ai/langgraph-typescript/shared-state/predictive-state-updates?agent-type=custom-graph&state-emission=manual-emission) writes `copilotkitEmitState(config, state);` inside a loop. The function is an `AsyncFunction`, the SDK's own docstring for it writes `await copilotkitEmitState(config, { progress: i })`, and the Python tab on the same page writes `await copilotkit_emit_state(...)` — only the TypeScript tab drops it. In this specific example it works, because the `setTimeout(…, 1000)` on the next line gives the promise time to settle, but it is a floating promise: a rejection would be unhandled, and nothing orders the emissions against the sleep. Copy that loop into code without the delay and updates can interleave or be lost. `backend/src/agents/predictive-state-updates-manual.ts` reproduces it as published. The snippet is also a fragment — everything around the loop is elided behind `// ...`, so the surrounding node is this repo's.
 
 
+**18. The Quickstart's TypeScript agent hard-codes `gpt-6-luna`, and its Intelligence key was renamed.**
+[Quickstart](https://docs.copilotkit.ai/langgraph-typescript/quickstart) now has a TypeScript tab (doc-sync 2026-11-09). Its `src/agent.ts` builds `new ChatOpenAI({ modelKwargs: { reasoning_effort: "none" }, model: "gpt-6-luna" })` inline rather than reading a model setting, so `backend/src/agents/quickstart.ts` (verbatim) only answers if your key reaches that model; `OPENAI_MODEL` does not affect it. The runtime snippet now reads `CPK_INTELLIGENCE_API_KEY` (written by `npx copilotkit@latest project select`) instead of `INTELLIGENCE_API_KEY`; `frontend/src/lib/copilot-runtime.ts` reads the new name first and falls back to the old one. The page's FastAPI tab switched from `LangGraphHttpAgent` to `HttpAgent` from `@ag-ui/client`; that tab is Python-only and not exercised here.
+
 ---
 
 ## 10. Troubleshooting
@@ -397,7 +400,7 @@ Drawn from the Quickstart's own troubleshooting accordion and the failure modes 
 
 **Chat works, the mic returns 401.** `OPENAI_API_KEY` is reaching the LangGraph server but not the Next process. Next only auto-loads `.env` from its own directory — `ln -s ../.env frontend/.env.local` (§5).
 
-**"thread is already processing".** `runAgent` is being called on every render. Move it into an event handler, or a `useEffect` with an empty dependency array. The Configurable page warns about this specifically.
+**"thread is already processing".** `runAgent` is being called on every render. Move it into an event handler, or a `useEffect` with an empty dependency array. (The Configurable page used to warn about this; its 2026-11 rewrite dropped the `runAgent` example.)
 
 **Interrupt cards never appear.** Two causes, both silent. (1) `agentId` on `useInterrupt` must match a runtime-registered agent; omitting it defaults to `"default"` and the interrupt never fires. (2) `event.value` arrives JSON-stringified, so `event.value.type` is `undefined` and every `enabled` predicate returns false — parse it first (§9 item 15). If the backend log shows a `CUSTOM_EVENT` named `on_interrupt`, the graph is fine and the problem is one of these two.
 

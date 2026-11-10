@@ -26,7 +26,7 @@ export default function Page() {
               "Draft an announcement for a new pricing tier",
             ]}
             expect="Three cards appear in order — Researcher, Writer, Critic — each with its task and the sub-agent's output, then a short final answer in the chat. The role chips light up as each fires."
-            fail="The log stays empty while the agent answers directly — it skipped delegation. Or the same sub-agent fires repeatedly, which is what the 'EXACTLY ONCE' language in the instruction exists to prevent."
+            fail="Send a second message in the same thread: earlier entries appearing twice is the page's append-only reducer (README §9 item 19), not a harness bug. Otherwise: the log stays empty while the agent answers directly — it skipped delegation."
           />
         </div>
       </Panel>
@@ -46,6 +46,7 @@ export default function Page() {
       >
         <SourceCodeGroup
           files={[
+            { file: "backend/src/agents/subagents.ts", region: "state" },
             { file: "backend/src/agents/subagents.ts", region: "supervisor-delegation-tools" },
 
           ]}
