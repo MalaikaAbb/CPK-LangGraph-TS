@@ -8,22 +8,23 @@
  * them per turn. The tool body never runs here — CopilotKit executes it in the
  * browser and sends the result back as the tool message.
  *
- * Reproduced from the doc verbatim except for the model construction: the doc
- * imports an unpublished `makeChatOpenAI` helper (README §9).
+ * Reproduced from the doc verbatim, including its `gpt-6-luna` model literal.
+ * The two graphs below the region are this repo's and keep using `chatModel`.
  */
 
-import { RunnableConfig } from "@langchain/core/runnables";
+// Verbatim from https://docs.copilotkit.ai/langgraph-typescript/frontend-tools
+// ("frontend-tools.ts", doc-sync 2026-11-09). The page dropped the
+// unpublished `makeChatOpenAI` and now builds its model inline.
+//#region agent
+import type { RunnableConfig } from "@langchain/core/runnables";
 import { SystemMessage } from "@langchain/core/messages";
 import { MemorySaver, START, StateGraph } from "@langchain/langgraph";
-
+import { ChatOpenAI } from "@langchain/openai";
 import {
   convertActionsToDynamicStructuredTools,
   CopilotKitStateAnnotation,
 } from "@copilotkit/sdk-js/langgraph";
 
-import { chatModel } from "./model.js";
-
-//#region agent
 // CopilotKit forwards frontend tools to the agent via
 // `state.copilotkit.actions`. `CopilotKitStateAnnotation` adds that
 // channel to your graph's state; `convertActionsToDynamicStructuredTools`
@@ -34,9 +35,11 @@ export type AgentState = typeof AgentStateAnnotation.State;
 
 const SYSTEM_PROMPT = "You are a helpful, concise assistant.";
 
-async function chatNode(state: AgentState, config: RunnableConfig) {
-  const model = chatModel({ temperature: 0, model: "gpt-4o-mini" });
-
+async function runChatNode(
+  state: AgentState,
+  config: RunnableConfig,
+  model: ChatOpenAI,
+) {
   const modelWithTools = model.bindTools!([
     ...convertActionsToDynamicStructuredTools(state.copilotkit?.actions ?? []),
   ]);
@@ -49,17 +52,30 @@ async function chatNode(state: AgentState, config: RunnableConfig) {
   return { messages: response };
 }
 
-const workflow = new StateGraph(AgentStateAnnotation)
-  .addNode("chat_node", chatNode)
-  .addEdge(START, "chat_node")
-  .addEdge("chat_node", "__end__");
+async function chatNode(state: AgentState, config: RunnableConfig) {
+  return runChatNode(
+    state,
+    config,
+    new ChatOpenAI({
+      modelKwargs: { reasoning_effort: "none" },
+      temperature: 0,
+      model: "gpt-6-luna",
+    }),
+  );
+}
 
-const memory = new MemorySaver();
+function compileGraph(node: typeof chatNode) {
+  return new StateGraph(AgentStateAnnotation)
+    .addNode("chat_node", node)
+    .addEdge(START, "chat_node")
+    .addEdge("chat_node", "__end__")
+    .compile({ checkpointer: new MemorySaver() });
+}
 
-export const graph = workflow.compile({
-  checkpointer: memory,
-});
+export const graph = compileGraph(chatNode);
 //#endregion
+
+import { chatModel } from "./model.js";
 
 /**
  * `/generative-ui/tool-based` — `useComponent` registers a React component as
@@ -91,7 +107,15 @@ export const hitlInChatGraph = buildFrontendToolGraph(
 export const governedActionsGraph = buildFrontendToolGraph(
   "You are an operations assistant. Before any side-effecting action " +
     "(refunds, deletions, payments), call the approval tool the app registers " +
-    "and wait for the user's decision; report the outcome afterwards.",
+    "and wait for the user's decision; report the outcome afterwards.",)
+/**
+ * `/webmcp` — the page publishes only frontend code (`useFrontendTool` for
+ * `search_orders`, mirrored to `document.modelContext`). Any graph that binds
+ * the forwarded frontend tools serves it; this one is repo-authored.
+ */
+export const webmcpGraph = buildFrontendToolGraph(
+  "You are a helpful assistant. Use the tools the app registers to answer; " +
+    "when the user asks about orders, call `searchOrders`.",
 );
 
 function buildFrontendToolGraph(systemPrompt: string) {

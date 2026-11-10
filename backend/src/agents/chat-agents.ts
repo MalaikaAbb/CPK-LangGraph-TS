@@ -107,6 +107,15 @@ export const chatSlotsGraph = buildChatGraph(
   HELPFUL + " Use markdown — a short list or bold text where it helps.",
 );
 
+/**
+ * `/custom-look-and-feel/markdown` — the page has no backend code; any chat
+ * agent works. This one is nudged to answer in markdown so the three
+ * `markdownRenderer` shapes have headings and links to draw.
+ */
+export const chatMarkdownGraph = buildChatGraph(
+  HELPFUL + " Format answers in markdown (headings, lists, links) when it helps.",
+);
+
 /** `/custom-look-and-feel/headless-ui` — the minimal two-hook example. */
 export const headlessSimpleGraph = buildChatGraph(HELPFUL);
 

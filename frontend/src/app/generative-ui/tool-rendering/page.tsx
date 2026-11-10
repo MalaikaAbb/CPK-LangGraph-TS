@@ -22,9 +22,12 @@ export default function Page() {
         </p>
         <div className="mt-4">
           <TryIt
-            prompts={["What's the weather in Tokyo?", "How about São Paulo?"]}
+            prompts={[
+              "What's the weather in Tokyo?",
+              "Weather in Paris, AAPL's price, and roll a d20 — all at once.",
+            ]}
             expect="A sky-blue card appears with the city name and 'Calling weather API…', then fills in with 68°, Sunny, humidity and wind. The reply does not restate the numbers."
-            fail="Raw JSON or nothing at all in place of the card — the renderer's name does not match the tool's name."
+            fail="Raw JSON or nothing at all in place of the card — the renderer's name does not match the tool's name. For the multi-tool prompt, switch the toolCallDisplay picker above the chat: grouped/line/stacked collapse the catch-all calls only when 'group: true' is ticked; separate always shows one card per call."
           />
         </div>
       </Panel>

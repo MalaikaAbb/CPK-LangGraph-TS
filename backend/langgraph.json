@@ -12,6 +12,7 @@
 
     "chat-customization-css": "./src/agents/chat-agents.ts:chatCustomizationCssGraph",
     "chat-slots": "./src/agents/chat-agents.ts:chatSlotsGraph",
+    "chat-markdown": "./src/agents/chat-agents.ts:chatMarkdownGraph",
     "headless-simple": "./src/agents/chat-agents.ts:headlessSimpleGraph",
     "headless-complete": "./src/agents/chat-agents.ts:headlessCompleteGraph",
     "reasoning-default": "./src/agents/chat-agents.ts:reasoningDefaultGraph",
@@ -25,17 +26,24 @@
     "gen-ui-tool-based": "./src/agents/frontend-tools.ts:genUiToolBasedGraph",
     "a2ui-fixed-schema": "./src/agents/a2ui-fixed.ts:graph",
     "declarative-gen-ui": "./src/agents/declarative-gen-ui.ts:graph",
+    "mcp_apps": "./src/agents/mcp-apps.ts:graph",
+    "open_gen_ui": "./src/agents/open-gen-ui.ts:graph",
+    "open_gen_ui_advanced": "./src/agents/open-gen-ui-advanced.ts:graph",
+    "genui": "./src/agents/genui.ts:graph",
 
     "frontend_tools": "./src/agents/frontend-tools.ts:graph",
     "hitl-in-chat": "./src/agents/hitl-in-chat.ts:graph",
     "governed-actions": "./src/agents/frontend-tools.ts:governedActionsGraph",
     "gen-ui-interrupt": "./src/agents/interrupt-agent.ts:graph",
     "interrupt-headless": "./src/agents/interrupt-agent.ts:graph",
+    "frontend-tools-no-model": "./src/agents/frontend-tools-no-model.ts:graph",
+    "webmcp": "./src/agents/frontend-tools.ts:webmcpGraph",
     "interrupt-flow": "./src/agents/interrupt-flow.ts:graph",
 
     "shared-state-read-write": "./src/agents/shared-state-read-write.ts:graph",
     "shared-state-streaming": "./src/agents/shared-state-streaming.ts:graph",
    
+    "readonly-state-agent-context": "./src/agents/readonly-state-agent-context.ts:graph",
     "agent-app-context": "./src/agents/readonly-state.ts:agentAppContextGraph",
     "shared-state-language": "./src/agents/shared-state-language.ts:graph",
     "state-inputs-outputs": "./src/agents/state-inputs-outputs.ts:graph",

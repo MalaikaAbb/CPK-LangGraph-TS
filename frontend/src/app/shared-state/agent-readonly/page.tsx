@@ -49,7 +49,7 @@ export default function Page() {
       >
         <SourceCodeGroup
           files={[
-            { file: "backend/src/agents/readonly-state.ts", region: "inject-context" },
+            { file: "backend/src/agents/readonly-state-agent-context.ts", region: "inject-context" },
           ]}
         />
       </Panel>
