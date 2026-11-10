@@ -323,7 +323,7 @@ export const NAV: NavGroup[] = [
           "generateSandboxedUi streaming agent-written HTML/CSS/JS into a sandboxed iframe; an advanced variant adds sandbox functions that call back into the host.",
         status: "partial",
         statusNote:
-          "The page's Code tab verbatim (two agents, runtime route, both demo pages). A minimal ./chat is adapted from the CopilotKit showcase; ./design-skill and all suggestion chips left out (default design skill); makeChatOpenAI swapped for new ChatOpenAI. Advanced variant at /generative-ui/open-generative-ui/advanced. Not yet checked in a browser.",
+          "The page's Code tab verbatim (two agents, runtime route, both demo pages). A minimal ./chat and ./design-skill (feeds the openGenerativeUI.designSkill prop the page teaches) are borrowed from the CopilotKit showcase; all suggestion chips left out; makeChatOpenAI swapped for new ChatOpenAI. Advanced variant at /generative-ui/open-generative-ui/advanced. Not yet checked in a browser.",
       },
     ],
   },
