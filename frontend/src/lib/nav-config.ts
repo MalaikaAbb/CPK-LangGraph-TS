@@ -500,6 +500,18 @@ export const NAV: NavGroup[] = [
           "Driving runs from code with addMessage, runAgent, stopAgent and subscribe — no chat component.",
         status: "working",
       },
+      {
+        path: "/webmcp",
+        hasDemo: true,
+        agentId: "webmcp",
+        title: "WebMCP",
+        docPath: "/langgraph-typescript/webmcp",
+        summary:
+          "A frontend tool mirrored onto document.modelContext so WebMCP browser agents can call it, plus the core-only registration with no agent.",
+        status: "partial",
+        statusNote:
+          "Ported from aws-strands-ts; both snippets verbatim, searchOrders is a repo-authored stub. WebMCP itself needs Chrome 149+ with the flag or origin trial; elsewhere only the chat path works. Not yet checked in a browser.",
+      },
     ],
   },
   {

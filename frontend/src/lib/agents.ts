@@ -47,6 +47,7 @@ export const AGENT_IDS = [
   "frontend_tools",
   "frontend-tools-no-model",
   "hitl-in-chat",
+  "webmcp",
   "interrupt-flow",
   "programmatic-control",
 
