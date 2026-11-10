@@ -6,7 +6,7 @@ A navigable, working test harness for the CopilotKit ↔ LangGraph TypeScript in
 |---|---|
 | **Doc sync date** | Machine-maintained — `doc-snapshot/manifest.json` → `syncedAt`, rewritten on every sync |
 | **Docs tracked** | <https://docs.copilotkit.ai/langgraph-typescript> (34 pages) |
-| **CopilotKit** | `@copilotkit/react-core` `@copilotkit/runtime` `@copilotkit/voice` `@copilotkit/a2ui-renderer` — all `1.66.2`; `@copilotkit/sdk-js` `1.66.2` |
+| **CopilotKit** | `@copilotkit/react-core` `@copilotkit/runtime` `@copilotkit/voice` `@copilotkit/a2ui-renderer` — frontend `^1.85.0` (bumped from 1.80 for Components and surfaces, §9 item 18); `@copilotkit/sdk-js` `^1.80.0` (backend) |
 | **LangGraph** | `@langchain/langgraph` `1.4.9`, `@langchain/core` `1.2.5`, `@langchain/openai` `1.5.6`, `@langchain/langgraph-cli` `1.4.4` |
 | **Frontend** | Next.js `16.3.0`, React `19.2.8`, TypeScript `5` |
 | **Build** | `tsc --noEmit` clean · `eslint` clean · `next build` succeeds (35 routes prerendered) · all 32 graphs register |
@@ -200,8 +200,15 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | `/generative-ui/a2ui` | Overview: the three A2UI operations, the two approaches, the two ways to switch A2UI on, and the surface color variables, mapped onto this repo's two A2UI routes. | Read; follow the links to Dynamic / Fixed Schema. | Reference page; nothing runs on it. |
 | `/generative-ui/a2ui/dynamic-schema` | A secondary LLM designing a surface from your catalog. | "Show me a sales dashboard for Q3" | **Pass:** cards, metric tiles and a chart appear progressively. **Fail:** prose only → the catalog is not reaching the runtime. |
 | `/generative-ui/a2ui/fixed-schema` | A JSON-authored component tree; the tool supplies only data. | "Find me a flight from SFO to JFK" | **Pass:** a flight card with airport codes, airline badge and price. **Fail:** a raw operations blob → the A2UI middleware is not scoped to this agent. The Book button is inert by design (§9). |
-| `/generative-ui/json-render` | Agent-emitted JSON spec drawn by `@json-render/react` against a Zod catalog (metric card, bar, pie). Own runtime route and provider. | "Show me Q1 revenue by region as a bar chart, with a total metric card" | **Pass:** cards and charts instead of JSON. **Fail:** raw JSON → spec failed to parse/validate. |
-| `/generative-ui/hashbrown` | Streaming structured output parsed progressively by `@hashbrownai/react` (pinned 0.7.0). Own runtime route and provider. | "Build a sales dashboard: total revenue, revenue by quarter as a bar chart, and share by product as a pie chart" | **Pass:** components fill in while streaming. **Fail:** raw JSON, or "Export prompt doesn't exist" → Hashbrown drifted past 0.7.0. |
+| `/generative-ui/components` | `standardUI` on the provider; the runtime adds `render_ui` and the agent streams real components. Served by this repo's `genui` LangGraph graph (the page's runtime is a TanStack `BuiltInAgent`). | "Compare the Starter, Team, and Enterprise plans in a table", then "add a column for support" | **Pass:** a table streams in and the follow-up edits it in place. **Fail:** plain markdown → `render_ui` never reached the model. |
+| `/generative-ui/components/surfaces` | `GenerativeUISurface` page targets the chat fills, limits, scrolls to and replaces; every Components route talks to the `genui` agent through `/api/copilotkit-genui`. | "Show me cheap running shoes in the featured row." then "Show the featured products again." | **Pass:** the page's own row is replaced by a ProductGrid, and the second prompt brings the row back. **Fail:** the grid lands in the chat, so the target's description never reached the agent. |
+| `/generative-ui/components/catalogs` | `createGenerativeUI` catalogs: typed props, zod and Valibot, `extends`, `parameterOrder`, `exportA2UICatalog`. | "Show me three running shoes as product cards." | **Pass:** ProductCards with a name, price and image each (model-invented values); the Export tab lists `component, title, children, color`. **Fail:** standard components such as Table appear on `shopUI`. |
+| `/generative-ui/components/standard-catalog` | `standardUI` as is, extended, with `omit`, and with a `Card` override. | "Show the Eiffel Tower and the Louvre on a map." | **Pass:** a MapLibre map on `standardUI`, and no map on the omit variant. **Fail:** a plain list on `standardUI`, so `maplibre-gl` did not load. |
+| `/generative-ui/components/state-and-actions` | `bind` from app state, functions on click, events sent to the agent, writable props. | Add p1 twice, then "Show product cards for p1 Trail Runner and p2 City Sneaker." | **Pass:** "In cart: 2" and "In cart: 0" from app state; Add to cart updates the Cart panel with no chat message. **Fail:** a chat message on click, so the event did not match `addToCart`. |
+| `/generative-ui/components/theming` | `theme` variables, a typed theme file, dark overrides, map styles, `.a2ui-surface` CSS. | "Show a card with a primary button, a slider, and a bar chart of three months." | **Pass:** amber `#d97706` accent on the button and slider. **Fail:** the default accent on the Provider theme variant. The Map variant's basemap is blank by design (the page's URLs are placeholders). |
+| `/generative-ui/components/transports` | The `render_ui` tool transport vs `a2ui` fences in markdown, with `generativeUI: true` and `agentIds`. | "Compare the Starter, Team, and Enterprise plans in a table." | **Pass:** a table component (tool), a table inside the reply (markdown), and plain text when chatting as `default` under `agentIds: ["shop"]`. **Fail:** UI as `default`, so `agentIds` was ignored. |
+| `/generative-ui/components/markdown-mode` | The agent writes A2UI operations in `a2ui` code blocks in its reply. | "Give me a seat-count slider that shows the monthly price at $29 per seat." | **Pass:** prose with a live slider card in the middle. **Fail:** raw JSON in a code block. The `sendContext: false` variant shows no UI by design. |
+| `/generative-ui/components/from-a2ui` | The A2UI 1.0 "After" catalog (`Airport`, `Arrow`) on the new engine. | "Show a flight card from SFO (San Francisco) to JFK (New York) with a Book button." | **Pass:** two Airport components with an Arrow and a Button. **Fail:** a rejection naming a v0.9 shape. |
 
 ### App Control
 
@@ -268,8 +275,15 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | A2UI | `/generative-ui/a2ui` | ⚪ Reference | Overview. Setup paths run on the Dynamic/Fixed Schema routes; no-catalog `injectA2UITool: true` and the CSS variables are shown, not run. |
 | A2UI · Dynamic Schema | `/generative-ui/a2ui/dynamic-schema` | ⚠️ Partial | Catalog is the doc's; the leaf UI is this repo's. Most model-sensitive route in the repo — needs `gpt-4o`; one invented component name fails the whole surface. See §9. |
 | A2UI · Fixed Schema | `/generative-ui/a2ui/fixed-schema` | ⚠️ Partial | Book button inert — `a2ui.render` takes no `action_handlers` yet, per the page itself. |
-| JSON Render | `/generative-ui/json-render` | ⚠️ Partial | Page's Code tab verbatim minus the suggestion chips; `makeChatOpenAI` swapped for `new ChatOpenAI` (§9 item 2). Type-checks; not yet checked in a browser. |
-| Hashbrown | `/generative-ui/hashbrown` | ⚠️ Partial | Page's Code tab verbatim minus the suggestion chips, on `@hashbrownai/*` 0.7.0 exactly; `makeChatOpenAI` swapped for `new ChatOpenAI`. Type-checks; not yet checked in a browser. |
+| Components and surfaces | `/generative-ui/components` | ⚠️ Partial | The page's runtime is a TanStack `BuiltInAgent` (shown, not run); served by the repo-authored `genui` LangGraph graph (§9). Not yet checked in a browser. |
+| Surfaces | `/generative-ui/components/surfaces` | ⚠️ Partial | Ported from aws-strands-ts; Product/ProductRow scaffolding is repo-authored; no products tool, so the model invents products. Not yet checked in a browser. |
+| Catalogs | `/generative-ui/components/catalogs` | ⚠️ Partial | Ported from aws-strands-ts; Hero/Panel/cartUI scaffolding. Not yet checked in a browser. |
+| Standard catalog | `/generative-ui/components/standard-catalog` | ⚠️ Partial | Ported from aws-strands-ts; ProductCard/productSchema scaffolding. Not yet checked in a browser. |
+| State and actions | `/generative-ui/components/state-and-actions` | ⚠️ Partial | Ported from aws-strands-ts; cart scaffolding around fragment snippets. Not yet checked in a browser. |
+| Theming | `/generative-ui/components/theming` | ⚠️ Partial | Ported from aws-strands-ts; placeholder mapStyle URLs draw no basemap. Not yet checked in a browser. |
+| Transports | `/generative-ui/components/transports` | ⚠️ Partial | Ported from aws-strands-ts; the runtime's undefined `agent` is the `genui` graph, plus a `shop` entry. Not yet checked in a browser. |
+| Markdown mode | `/generative-ui/components/markdown-mode` | ⚠️ Partial | Ported from aws-strands-ts; `sendContext: false` variant renders no UI (backend shown only in Python). Not yet checked in a browser. |
+| Adopt from A2UI | `/generative-ui/components/from-a2ui` | ⚠️ Partial | Ported from aws-strands-ts; Airport/Arrow scaffolding. Not yet checked in a browser. |
 | Frontend Tools | `/frontend-tools` | ✅ Working | |
 | Human-in-the-Loop | `/human-in-the-loop` | ✅ Working | |
 | Interrupts | `/human-in-the-loop/interrupt-flow` | ✅ Working | `enabled` predicate signature differs from the doc — see §9. |
@@ -389,8 +403,11 @@ The same tab also specifies `model: "openai:gpt-6-luna"` (`openai:gpt-5.4` befor
 [Predictive state updates](https://docs.copilotkit.ai/langgraph-typescript/shared-state/predictive-state-updates?agent-type=custom-graph&state-emission=manual-emission) writes `copilotkitEmitState(config, state);` inside a loop. The function is an `AsyncFunction`, the SDK's own docstring for it writes `await copilotkitEmitState(config, { progress: i })`, and the Python tab on the same page writes `await copilotkit_emit_state(...)` — only the TypeScript tab drops it. In this specific example it works, because the `setTimeout(…, 1000)` on the next line gives the promise time to settle, but it is a floating promise: a rejection would be unhandled, and nothing orders the emissions against the sleep. Copy that loop into code without the delay and updates can interleave or be lost. `backend/src/agents/predictive-state-updates-manual.ts` reproduces it as published. The snippet is also a fragment — everything around the loop is elided behind `// ...`, so the surrounding node is this repo's.
 
 
-**18. Agent Read-Only Context's chat node type-checks a string branch that can't happen.**
-[Agent Read-Only Context](https://docs.copilotkit.ai/langgraph-typescript/shared-state/agent-readonly) tests `typeof appContext === "string" && appContext.trim() === ""`, but `state.copilotkit.context` is typed as an array of `{ description, value }` entries, so under `strict` the string branch narrows to `never` and `.trim()` is a type error (TS2339). It is harmless at runtime (the branch never runs), and `backend/src/agents/readonly-state-agent-context.ts` keeps it verbatim behind a `@ts-expect-error`. The same Code-tab file exports a `chatNode` built on the public `ChatOpenAI` constructor but wires the graph to a `chatNodeWithHeaders` that uses the unpublished `makeChatOpenAI` (item 2; swapped here for `chatModel` with the same options), so the node the page shows is not the one that runs.
+**18. Components and surfaces needs CopilotKit 1.85; this repo pinned 1.80.**
+The nine [Components and surfaces](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/components) pages import `@copilotkit/react-core/v2/generative-ui` (`standardUI`, `createGenerativeUI`, `GenerativeUISurface`, …), which `@copilotkit/react-core` 1.80.0 does not ship. Since doc-sync 2026-11-09 `frontend/package.json` pins `@copilotkit/*` `^1.85.0` and `@ag-ui/client` / `@ag-ui/core` `1.0.2` (the exact version 1.85 pins, with matching `overrides`, so one copy is installed). `tsc` over the whole frontend stays clean after the bump. The routes also add `valibot`, `@valibot/to-json-schema` (Catalogs' schema-library sample) and `maplibre-gl` (Map component).
+
+**19. Components and surfaces publishes no LangGraph agent.**
+These pages are framework-neutral. The overview's runtime is a TanStack `BuiltInAgent` factory, and the other pages change nothing on the runtime: the provider's catalog makes the runtime add `render_ui` and its guide to each run. No page shows how a LangGraph graph should consume them, so `backend/src/agents/genui.ts` is **repo-authored**. It binds `state.copilotkit.actions` (where `render_ui` lands), folds `state.copilotkit.context` (the guide) into its prompt. It carries no backend tools: the Catalogs/Surfaces pages ask for product data that no page defines, and the sibling's `search_products` demo tool was left out (not needed for the hooks to render), so the model invents product values. The demos, their scaffolding components and the two runtime routes (`/api/copilotkit-genui`, `/api/copilotkit-genui-transports`) are **ported from the aws-strands-ts harness**, with the agent swapped for `LangGraphAgent({ graphId: "genui" })`. The page snippets inside them were re-checked against the langgraph-typescript pages, whose markdown is identical to the strands-typescript ones apart from links.
 
 ---
 
@@ -529,8 +546,15 @@ Grouped as the doc sidebar groups them. All 34 tracked pages.
 - [A2UI](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/a2ui)
 - [A2UI · Dynamic Schema](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/a2ui/dynamic-schema)
 - [A2UI · Fixed Schema](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/a2ui/fixed-schema)
-- [JSON Render](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/json-render)
-- [Hashbrown](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/hashbrown)
+- [Components and surfaces](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/components)
+- [Surfaces](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/components/surfaces)
+- [Catalogs](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/components/catalogs)
+- [Standard catalog](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/components/standard-catalog)
+- [State and actions](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/components/state-and-actions)
+- [Theming](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/components/theming)
+- [Transports](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/components/transports)
+- [Markdown mode](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/components/markdown-mode)
+- [Adopt from A2UI](https://docs.copilotkit.ai/langgraph-typescript/generative-ui/components/from-a2ui)
 
 **Add Agent Powers**
 - [Frontend Tools](https://docs.copilotkit.ai/langgraph-typescript/frontend-tools)

@@ -26,8 +26,7 @@
     "gen-ui-tool-based": "./src/agents/frontend-tools.ts:genUiToolBasedGraph",
     "a2ui-fixed-schema": "./src/agents/a2ui-fixed.ts:graph",
     "declarative-gen-ui": "./src/agents/declarative-gen-ui.ts:graph",
-    "byoc_json_render": "./src/agents/byoc-json-render.ts:graph",
-    "byoc_hashbrown": "./src/agents/byoc-hashbrown.ts:graph",
+    "genui": "./src/agents/genui.ts:graph",
 
     "frontend_tools": "./src/agents/frontend-tools.ts:graph",
     "frontend-tools-no-model": "./src/agents/frontend-tools-no-model.ts:graph",

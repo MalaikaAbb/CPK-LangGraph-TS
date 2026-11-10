@@ -10,17 +10,15 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ag-ui/client": "1.0.3",
-    "@ag-ui/core": "1.0.3",
-    "@copilotkit/a2ui-renderer": "^1.80.0",
-    "@copilotkit/react-core": "^1.80.0",
-    "@copilotkit/runtime": "^1.80.0",
-    "@copilotkit/voice": "^1.80.0",
-    "@hashbrownai/core": "0.7.0",
-    "@hashbrownai/react": "0.7.0",
-    "@json-render/core": "^0.21.4",
-    "@json-render/react": "^0.21.4",
+    "@ag-ui/client": "1.0.2",
+    "@ag-ui/core": "1.0.2",
+    "@copilotkit/a2ui-renderer": "^1.85.0",
+    "@copilotkit/react-core": "^1.85.0",
+    "@copilotkit/runtime": "^1.85.0",
+    "@copilotkit/voice": "^1.85.0",
+    "@valibot/to-json-schema": "^1.8.0",
     "lucide-react": "^0.577.0",
+    "maplibre-gl": "^5.24.0",
     "next": "16.3.8",
     "openai": "^5.9.0",
     "react": "19.2.8",
@@ -28,8 +26,8 @@
     "recharts": "^3.7.1",
     "server-only": "^0.0.1",
     "shiki": "^4.4.2",
-    "zod": "^3.25.76",
-    "zod4": "npm:zod@^4.6.7"
+    "valibot": "^1.5.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -42,7 +40,7 @@
     "typescript": "^5"
   },
   "overrides": {
-    "@ag-ui/client": "1.0.3",
-    "@ag-ui/core": "1.0.3"
+    "@ag-ui/client": "1.0.2",
+    "@ag-ui/core": "1.0.2"
   }
 }
