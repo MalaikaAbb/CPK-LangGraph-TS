@@ -14,7 +14,8 @@
  *   forward a tool argument into a state key while it is still streaming.
  *
  * Reproduced from the doc's `agent-type=prebuilt` tab with nothing adapted —
- * including `model: "openai:gpt-5.4"`. That model name is the page's. If your
+ * including `model: "openai:gpt-6-luna"` (was `openai:gpt-5.4` before
+ * doc-sync 2026-11-09). That model name is the page's. If your
  * key cannot reach it, this tab fails at the first turn with an OpenAI model
  * error while every other route keeps working; the custom-graph tab beside it
  * is unaffected. Changing it is a one-line edit, deliberately not applied.
@@ -59,7 +60,7 @@ const stepProgressTool = tool(async (args) => args, {
 });
 
 export const graph = createAgent({
-  model: "openai:gpt-5.4",
+  model: "openai:gpt-6-luna",
   tools: [stepProgressTool],
   middleware: [
     copilotkitMiddleware,

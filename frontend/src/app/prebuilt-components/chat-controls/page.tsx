@@ -17,6 +17,16 @@ export default function Page() {
           message slot is what makes those buttons appear at all — they are
           opt-in, not hidden by default.
         </p>
+        <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+          The page now leads with a third option, the controlled pattern: the
+          demo&apos;s <code>&lt;CopilotSidebar open=&#123;chatOpen&#125;
+          onOpenChange=&#123;setChatOpen&#125; /&gt;</code> owns the open state
+          in page state, so the sidebar only moves when <code>chatOpen</code>{" "}
+          does. <code>onOpenChange</code> reports a request; ignoring it keeps
+          the sidebar where it is. The thumbs buttons can also appear without
+          handlers when Automatic Learning capture is on, which needs
+          CopilotKit Intelligence and is not tested here.
+        </p>
         <div className="mt-4">
           <TryIt
             prompts={["Ask the assistant → then send: what's the weather like?"]}
