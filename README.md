@@ -274,11 +274,11 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Reading agent state | `/shared-state/in-app-agent-read` | ✅ Working | |
 | Writing agent state | `/shared-state/in-app-agent-write` | ✅ Working | |
 | Input/Output Schemas | `/shared-state/state-inputs-outputs` | ⚠️ Partial | Doc declares `resources` but never writes or reads it — the internal-state half is this repo's. See §9. |
-| Predictive state updates | `/shared-state/predictive-state-updates` | ⚠️ Partial | Two tabs, one per `agent-type`. Custom graph works. Prebuilt tab is verbatim including `model: "openai:gpt-5.4"`, so it runs only if your key reaches that model — see §9. |
-| Sub-Agents | `/multi-agent/subagents` | ⚠️ Partial | Backend is the page's Code-tab `subagents.ts` verbatim (model `gpt-6-luna`), minus the unpublished `openai-headers` `showcaseGraph`. Delegation log doubles on a continued thread (§9 item 19). |
+| Predictive state updates | `/shared-state/predictive-state-updates` | ⚠️ Partial | Two tabs, one per `agent-type`. Both graphs now verbatim with `gpt-6-luna` (custom: `ChatOpenAI`; prebuilt: `"openai:gpt-6-luna"`), so they run only if your key reaches that model — see §9 item 16. |
+| Sub-Agents | `/multi-agent/subagents` | ✅ Working | Supervisor node + graph assembly are this repo's; tools and state are the doc's. |
 | Subgraphs | `/subgraphs` | ⚠️ Partial | Page publishes only the frontend snippet, so the parent/child graph is this repo's. |
-| Agent Config | `/agent-config` | ✅ Working | Graph published in full; reproduced. |
-| Configurable | `/configurable` | ⚠️ Partial | Page now publishes only a `graph.invoke(..., { context, recursionLimit })` fragment; schema, node and runtime wiring are repo-authored (§9 item 18). Not yet checked in a browser. |
+| Agent Config | `/agent-config` | ✅ Working | Graph published in full; reproduced verbatim, including `.toReversed()` (previously rewritten as `.reverse()`) and the inline `gpt-6-luna` model. |
+| Configurable | `/configurable` | ✅ Working | |
 
 **Totals:** 24 ✅ Working · 10 ⚠️ Partial · 1 ⚪ Reference · 0 ❌ Broken · 0 🚧 Not started.
 
@@ -374,7 +374,7 @@ A graph calling `interrupt({ type: "ask", content: "…" })` does not deliver an
 **16. The prebuilt-agent state schema on Predictive state updates does not typecheck.**
 [Predictive state updates](https://docs.copilotkit.ai/langgraph-typescript/shared-state/predictive-state-updates?agent-type=prebuilt) declares `observed_steps: z.array(z.string()).default(() => [])` inside `new StateSchema({...})`. Against `@langchain/langgraph` 1.4.9 that is rejected: `StateSchema` fields must satisfy `SerializableSchema`, whose `~standard` implements both StandardSchemaV1 and StandardJSONSchemaV1, and zod 3.25 implements only the former — notwithstanding LangGraph's own docstring presenting a bare `z.object(...)` as compliant. Verified to construct and run correctly at runtime, so this is a type-level version skew rather than a broken example. `backend/src/agents/predictive-state-updates-prebuilt.ts` keeps the field as published behind a `@ts-expect-error`. The custom-graph tab uses `Annotation.Root` and is unaffected — which is also why the rest of this repo uses the annotation dialect (§9 item 4).
 
-The same tab also specifies `model: "openai:gpt-5.4"`. That name is reproduced verbatim rather than mapped to the repo's configured model, so if your key cannot reach it this one tab fails at the first turn with an OpenAI model error while every other route keeps working. Change the `model` line in `backend/src/agents/predictive-state-updates-prebuilt.ts` to a model you have — e.g. `"openai:gpt-4o-mini"` — if you want it live.
+The same tab also specifies `model: "openai:gpt-6-luna"` (`openai:gpt-5.4` before doc-sync 2026-11-09). That name is reproduced verbatim rather than mapped to the repo's configured model, so if your key cannot reach it this one tab fails at the first turn with an OpenAI model error. Since the same sync, the custom-graph tab is verbatim too: `new ChatOpenAI({ model: "gpt-6-luna", modelKwargs: { parallel_tool_calls: false, reasoning_effort: "none" } })` in `backend/src/agents/predictive-state-updates.ts`, which used to read `OPENAI_MODEL`. Change the `model` lines to a model you have if you want them live.
 
 
 **17. The manual-emission snippet does not await `copilotkitEmitState`.**
