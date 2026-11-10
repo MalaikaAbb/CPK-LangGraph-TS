@@ -1,8 +1,9 @@
 // Verbatim from the Code tab of https://docs.copilotkit.ai/langgraph-typescript/shared-state/agent-readonly
 // ("src/agent/readonly-state.ts", doc-sync 2026-11-09). Kept in its own file
 // because this repo's readonly-state.ts holds the Readables graph. Harness
-// changes: `#region` comment markers only. `./openai-headers` is borrowed from
-// the CopilotKit showcase (README §9 item 2).
+// changes: `#region` comment markers, and the unpublished
+// `makeChatOpenAI(config, …)` from `./openai-headers` swapped for this repo's
+// `chatModel(…)` (same options; README §9 item 2).
 /**
  * LangGraph TypeScript agent backing the Shared State (Agent Read-Only) demo.
  *
@@ -22,7 +23,7 @@ import type { RunnableConfig } from "@langchain/core/runnables";
 import { SystemMessage } from "@langchain/core/messages";
 import { MemorySaver, START, StateGraph } from "@langchain/langgraph";
 import { ChatOpenAI } from "@langchain/openai";
-import { makeChatOpenAI } from "./openai-headers";
+import { chatModel } from "./model.js"; // doc: import { makeChatOpenAI } from "./openai-headers";
 
 import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langgraph";
 
@@ -94,7 +95,7 @@ async function chatNodeWithHeaders(state: AgentState, config: RunnableConfig) {
   return runChatNode(
     state,
     config,
-    makeChatOpenAI(config, { model: "gpt-6-luna" }),
+    chatModel({ model: "gpt-6-luna" }),
   );
 }
 

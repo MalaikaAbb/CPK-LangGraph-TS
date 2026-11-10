@@ -269,7 +269,7 @@ Every route has a notes page (what it demonstrates, verbatim source, known cavea
 | Shared State | `/shared-state` | ✅ Working | `set_notes` written to the contract the page describes in prose. |
 | Render state in your app | `/shared-state/rendering-in-app` | ✅ Working | |
 | State Streaming | `/shared-state/streaming` | ✅ Working | |
-| Agent Read-Only Context | `/shared-state/agent-readonly` | ⚠️ Partial | Graph was missing from `langgraph.json` on `main` (route would 404); now the page's Code-tab agent verbatim (`gpt-6-luna` via borrowed `makeChatOpenAI`). Not yet checked in a browser. |
+| Agent Read-Only Context | `/shared-state/agent-readonly` | ⚠️ Partial | Graph was missing from `langgraph.json` on `main` (route would 404); now the page's Code-tab agent verbatim (`gpt-6-luna`; `makeChatOpenAI` swapped for `chatModel`, §9 item 2). Not yet checked in a browser. |
 | Readables | `/agent-app-context` | ⚠️ Partial | Covers `impl=graph`. `impl=prebuilt` (`createAgent` + `copilotkitMiddleware`) documented, not run. |
 | Reading agent state | `/shared-state/in-app-agent-read` | ✅ Working | |
 | Writing agent state | `/shared-state/in-app-agent-write` | ✅ Working | |
@@ -382,7 +382,7 @@ The same tab also specifies `model: "openai:gpt-5.4"`. That name is reproduced v
 
 
 **18. Agent Read-Only Context's chat node type-checks a string branch that can't happen.**
-[Agent Read-Only Context](https://docs.copilotkit.ai/langgraph-typescript/shared-state/agent-readonly) tests `typeof appContext === "string" && appContext.trim() === ""`, but `state.copilotkit.context` is typed as an array of `{ description, value }` entries, so under `strict` the string branch narrows to `never` and `.trim()` is a type error (TS2339). It is harmless at runtime (the branch never runs), and `backend/src/agents/readonly-state-agent-context.ts` keeps it verbatim behind a `@ts-expect-error`. The same Code-tab file exports a `chatNode` built on the public `ChatOpenAI` constructor but wires the graph to a `chatNodeWithHeaders` that uses the unpublished `makeChatOpenAI` (item 2), so the node the page shows is not the one that runs.
+[Agent Read-Only Context](https://docs.copilotkit.ai/langgraph-typescript/shared-state/agent-readonly) tests `typeof appContext === "string" && appContext.trim() === ""`, but `state.copilotkit.context` is typed as an array of `{ description, value }` entries, so under `strict` the string branch narrows to `never` and `.trim()` is a type error (TS2339). It is harmless at runtime (the branch never runs), and `backend/src/agents/readonly-state-agent-context.ts` keeps it verbatim behind a `@ts-expect-error`. The same Code-tab file exports a `chatNode` built on the public `ChatOpenAI` constructor but wires the graph to a `chatNodeWithHeaders` that uses the unpublished `makeChatOpenAI` (item 2; swapped here for `chatModel` with the same options), so the node the page shows is not the one that runs.
 
 ---
 
@@ -465,7 +465,6 @@ langgraph-typescript/
 │       ├── predictive-state-updates.ts
 │       ├── readonly-state.ts    # agent-app-context (Readables)
 │       ├── readonly-state-agent-context.ts  # agent-readonly (Code-tab file)
-│       ├── openai-headers.ts    # makeChatOpenAI, borrowed from the showcase
 │       ├── interrupt-flow.ts    # LangGraph interrupt()
 │       ├── subagents.ts         # supervisor + 3 delegation tools
 │       ├── subgraphs.ts         # a compiled graph as a node

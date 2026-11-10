@@ -391,7 +391,7 @@ export const NAV: NavGroup[] = [
           "useAgentContext as a one-way UI-to-agent channel — props for the agent, with no setter.",
         status: "partial",
         statusNote:
-          "Backend graph was missing from langgraph.json; now the page's Code-tab agent verbatim (gpt-6-luna via makeChatOpenAI, borrowed from the showcase). Not yet checked in a browser.",
+          "Backend graph was missing from langgraph.json; now the page's Code-tab agent verbatim (gpt-6-luna; the unpublished makeChatOpenAI swapped for the repo's chatModel). Not yet checked in a browser.",
       },
       {
         path: "/agent-app-context",
