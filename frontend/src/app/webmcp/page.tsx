@@ -43,7 +43,6 @@ export default function Page() {
         <SourceCodeGroup
           files={[
             { file: `${DIR}/search-orders.ts` },
-            { file: `${DIR}/model-context-status.tsx` },
             { file: "frontend/src/app/webmcp/demo-chat/page.tsx" },
             { file: "frontend/src/app/webmcp/demo-chat/core-only/page.tsx" },
           ]}
