@@ -1,7 +1,8 @@
 // Verbatim from the Code tab of https://docs.copilotkit.ai/langgraph-typescript/generative-ui/a2ui/fixed-schema
 // ("src/agent/a2ui-fixed.ts", doc-sync 2026-11-09). Harness changes: the two
-// `#region` comment markers only. `./openai-headers` is borrowed from the
-// CopilotKit showcase (see that file's header; README §9 item 2).
+// `#region` comment markers, and the unpublished `makeChatOpenAI(config, …)`
+// from `./openai-headers` swapped for this repo's `chatModel(…)` (same options;
+// README §9 item 2).
 /**
  * LangGraph TypeScript agent for the Declarative Generative UI (A2UI — Fixed Schema) demo.
  *
@@ -13,7 +14,7 @@
  * Ported from `src/agents/a2ui_fixed.py`.
  */
 
-import { makeChatOpenAI } from "./openai-headers";
+import { chatModel } from "./model.js"; // doc: import { makeChatOpenAI } from "./openai-headers";
 
 import { readFileSync } from "fs";
 import { dirname, join } from "path";
@@ -131,7 +132,7 @@ const SYSTEM_PROMPT =
   "Keep any chat reply to one short sentence.";
 
 async function chatNode(state: AgentState, config: RunnableConfig) {
-  const model = makeChatOpenAI(config, {
+  const model = chatModel({
     temperature: 0,
     model: "gpt-6-luna",
   });

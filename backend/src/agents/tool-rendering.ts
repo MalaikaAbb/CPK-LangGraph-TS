@@ -1,7 +1,8 @@
 // Verbatim from the Code tab of https://docs.copilotkit.ai/langgraph-typescript/generative-ui/tool-rendering
 // ("src/agent/tool-rendering.ts", doc-sync 2026-11-09): all four tools, not
-// just get_weather. Harness changes: the `#region` comment markers only.
-// `./openai-headers` is borrowed from the CopilotKit showcase (README §9 item 2).
+// just get_weather. Harness changes: the `#region` comment markers, and the
+// unpublished `makeChatOpenAI(config, …)` from `./openai-headers` swapped for
+// this repo's `chatModel(…)` (same options; README §9 item 2).
 /**
  * Tool Rendering agent -- TypeScript port of tool_rendering_agent.py.
  *
@@ -14,7 +15,7 @@
  * renders the same tool calls.
  */
 
-import { makeChatOpenAI } from "./openai-headers";
+import { chatModel } from "./model.js"; // doc: import { makeChatOpenAI } from "./openai-headers";
 
 import { z } from "zod";
 import type { RunnableConfig } from "@langchain/core/runnables";
@@ -191,7 +192,7 @@ const tools = [getWeather, searchFlights, getStockPrice, rollD20];
 // ---------------------------------------------------------------------------
 
 async function chatNode(state: AgentState, config: RunnableConfig) {
-  const model = makeChatOpenAI(config, { model: "gpt-6-luna" });
+  const model = chatModel({ model: "gpt-6-luna" });
 
   const modelWithTools = model.bindTools!([
     ...convertActionsToDynamicStructuredTools(state.copilotkit?.actions ?? []),
