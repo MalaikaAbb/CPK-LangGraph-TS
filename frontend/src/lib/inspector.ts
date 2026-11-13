@@ -35,6 +35,8 @@ export const NESTED_PROVIDER_ROUTES = [
   "/human-in-the-loop/index/demo-chat",
   "/human-in-the-loop/useInterrupt/demo-chat",
   "/human-in-the-loop/headless/demo-chat",
+  "/generative-ui/json-render/demo-chat",
+  "/generative-ui/hashbrown/demo-chat",
   "/generative-ui/mcp-apps/demo-chat",
   "/generative-ui/open-generative-ui/demo-chat",
   "/generative-ui/open-generative-ui/advanced",
