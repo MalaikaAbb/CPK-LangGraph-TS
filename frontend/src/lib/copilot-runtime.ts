@@ -21,7 +21,11 @@ import {
  * Server-side only, and deliberately not `NEXT_PUBLIC_`. A project key prefixed
  * for the browser would ship in the JS bundle.
  */
-const INTELLIGENCE_API_KEY = process.env.INTELLIGENCE_API_KEY;
+// The Quickstart renamed this to `CPK_INTELLIGENCE_API_KEY` (doc-sync
+// 2026-11-09; `npx copilotkit@latest project select` writes that name). The
+// old name is still read so existing `.env.local` files keep working.
+const INTELLIGENCE_API_KEY =
+  process.env.CPK_INTELLIGENCE_API_KEY ?? process.env.INTELLIGENCE_API_KEY;
 
 /**
  * A SECOND, SEPARATE credential — and one of the two things that unlock the

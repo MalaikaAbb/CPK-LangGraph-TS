@@ -11,7 +11,7 @@ exposes three primitives that cover every triggering pattern:
 
 - `agent.addMessage(...)` — append a message to the conversation without running the agent. Pair with `copilotkit.runAgent({ agent })` when you want the appended message to kick off a turn.
 - `copilotkit.runAgent({ agent })` — the same entry point `<CopilotChat />` calls under the hood. Orchestrates frontend tools, follow-up runs, and the subscriber lifecycle.
-- `agent.subscribe(subscriber)` — low-level AG-UI event subscription (`onCustomEvent`, `onRunStartedEvent`, `onRunFinalized`, `onRunFailed`, …). Pairs with `copilotkit.runAgent({ agent, forwardedProps: { command: { resume, interruptEvent } } })` to drive interrupt resolution from arbitrary UI.
+- `agent.subscribe(subscriber)` — low-level AG-UI event subscription (`onCustomEvent`, `onRunStartedEvent`, `onRunFinalized`, `onRunFailed`, …). Pairs with `copilotkit.runAgent({ agent, resume })` for standard AG-UI interrupts, or `copilotkit.runAgent({ agent, forwardedProps: { command: { resume, interruptEvent } } })` for legacy `on_interrupt` custom events, to drive interrupt resolution from arbitrary UI.
 
 The send-and-stop example below is intentionally self-contained. The
 later subscription and interrupt examples are pulled from the live
@@ -48,12 +48,10 @@ Use programmatic control when you want to:
 
     
 ~~~~typescript title="frontend-tools.ts"
-import { RunnableConfig } from "@langchain/core/runnables";
+import type { RunnableConfig } from "@langchain/core/runnables";
 import { SystemMessage } from "@langchain/core/messages";
 import { MemorySaver, START, StateGraph } from "@langchain/langgraph";
 import { ChatOpenAI } from "@langchain/openai";
-import { makeChatOpenAI } from "./openai-headers";
-
 import {
   convertActionsToDynamicStructuredTools,
   CopilotKitStateAnnotation,
@@ -69,12 +67,11 @@ export type AgentState = typeof AgentStateAnnotation.State;
 
 const SYSTEM_PROMPT = "You are a helpful, concise assistant.";
 
-async function chatNode(state: AgentState, config: RunnableConfig) {
-  const model = makeChatOpenAI(config, {
-    temperature: 0,
-    model: "gpt-4o-mini",
-  });
-
+async function runChatNode(
+  state: AgentState,
+  config: RunnableConfig,
+  model: ChatOpenAI,
+) {
   const modelWithTools = model.bindTools!([
     ...convertActionsToDynamicStructuredTools(state.copilotkit?.actions ?? []),
   ]);
@@ -87,16 +84,27 @@ async function chatNode(state: AgentState, config: RunnableConfig) {
   return { messages: response };
 }
 
-const workflow = new StateGraph(AgentStateAnnotation)
-  .addNode("chat_node", chatNode)
-  .addEdge(START, "chat_node")
-  .addEdge("chat_node", "__end__");
+async function chatNode(state: AgentState, config: RunnableConfig) {
+  return runChatNode(
+    state,
+    config,
+    new ChatOpenAI({
+      modelKwargs: { reasoning_effort: "none" },
+      temperature: 0,
+      model: "gpt-6-luna",
+    }),
+  );
+}
 
-const memory = new MemorySaver();
+function compileGraph(node: typeof chatNode) {
+  return new StateGraph(AgentStateAnnotation)
+    .addNode("chat_node", node)
+    .addEdge(START, "chat_node")
+    .addEdge("chat_node", "__end__")
+    .compile({ checkpointer: new MemorySaver() });
+}
 
-export const graph = workflow.compile({
-  checkpointer: memory,
-});
+export const graph = compileGraph(chatNode);
 ~~~~
 
 
@@ -108,6 +116,8 @@ The canonical pattern is to append a user message with
 `copilotkit.stopAgent({ agent })` to cancel an in-flight run.
 
 ```tsx title="frontend/src/app/agent-trigger.tsx"
+"use client";
+
 import { useAgent, useCopilotKit } from "@copilotkit/react-core/v2";
 
 export function AgentTrigger({ agentId }: { agentId: string }) {
@@ -151,7 +161,7 @@ export function AgentTrigger({ agentId }: { agentId: string }) {
 Both methods trigger the agent, but they operate at different levels:
 
 - **`copilotkit.runAgent({ agent })`** — the recommended default. Orchestrates the full lifecycle: executes frontend tools, handles follow-up runs, and routes errors through the subscriber system.
-- **`agent.runAgent(options)`** — low-level method on the agent instance. Sends the request to the runtime but does **not** execute frontend tools or chain follow-ups. Reach for this only when you need direct control. (For the interrupt-resume case, use `copilotkit.runAgent({ agent, forwardedProps: { command: { resume, interruptEvent } } })` — see the snippet below — so the subscriber lifecycle still wraps the resumed run.)
+- **`agent.runAgent(options)`** — low-level method on the agent instance. Sends the request to the runtime but does **not** execute frontend tools or chain follow-ups. Reach for this only when you need direct control. (For the interrupt-resume case, use `copilotkit.runAgent({ agent, resume })` for standard AG-UI interrupts, or `copilotkit.runAgent({ agent, forwardedProps: { command: { resume, interruptEvent } } })` for legacy `on_interrupt` custom events — the snippet below shows the legacy form — so the subscriber lifecycle still wraps the resumed run.)
 
 ## Subscribing to agent events
 

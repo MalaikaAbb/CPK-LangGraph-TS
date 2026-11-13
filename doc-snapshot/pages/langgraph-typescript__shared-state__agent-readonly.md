@@ -59,9 +59,11 @@ Think of it as "props for the agent".
 
     
 ~~~~typescript title="readonly-state.ts"
-async function chatNode(state: AgentState, config: RunnableConfig) {
-  const model = makeChatOpenAI(config, { model: "gpt-5.4" });
-
+async function runChatNode(
+  state: AgentState,
+  config: RunnableConfig,
+  model: ChatOpenAI,
+) {
   // Inject read-only context from useAgentContext / useCopilotReadable.
   // Mirrors the `createAppContextBeforeAgent` logic in CopilotKitMiddleware:
   // context may be a string or an object — stringify it and prepend as a
@@ -92,6 +94,17 @@ async function chatNode(state: AgentState, config: RunnableConfig) {
   );
 
   return { messages: response };
+}
+
+export async function chatNode(state: AgentState, config: RunnableConfig) {
+  return runChatNode(
+    state,
+    config,
+    new ChatOpenAI({
+      modelKwargs: { reasoning_effort: "none" },
+      model: "gpt-6-luna",
+    }),
+  );
 }
 ~~~~
 

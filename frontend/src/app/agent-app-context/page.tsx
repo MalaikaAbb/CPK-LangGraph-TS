@@ -30,7 +30,7 @@ export default function Page() {
               "Remove Jane Smith from the list, then ask: who can review a design?",
             ]}
             expect="The first answer names all three from the sidebar. After removing Jane, the agent no longer offers her and reaches for whoever is left — with no message telling it the roster changed."
-            fail="The agent says it has no information about your colleagues. The readable is not reaching the graph — check that the graph's state spreads CopilotKitStateAnnotation.spec, since that is what creates the channel."
+            fail="The agent says it has no information about your colleagues. The readable is not reaching the graph — check that the graph's state spreads CopilotKitStateSchema.fields, since that is what creates the channel. A wrong model literal (the page uses gpt-6-luna) shows up as an OpenAI model error instead."
           />
         </div>
       </Panel>
