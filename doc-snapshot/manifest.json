@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "docsRoot": "https://docs.copilotkit.ai/langgraph-typescript",
-  "syncedAt": "2026-11-09T12:31:45.378Z",
+  "syncedAt": "2026-11-13T11:09:42.087Z",
   "pages": {
     "/langgraph-typescript": {
       "file": "langgraph-typescript.md",
@@ -14,7 +14,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:46 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:42 GMT"
     },
     "/langgraph-typescript/agent-app-context": {
       "file": "langgraph-typescript__agent-app-context.md",
@@ -26,7 +26,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:46 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:42 GMT"
     },
     "/langgraph-typescript/agent-config": {
       "file": "langgraph-typescript__agent-config.md",
@@ -38,7 +38,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:46 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:42 GMT"
     },
     "/langgraph-typescript/configurable": {
       "file": "langgraph-typescript__configurable.md",
@@ -50,7 +50,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:46 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:42 GMT"
     },
     "/langgraph-typescript/custom-look-and-feel/css": {
       "file": "langgraph-typescript__custom-look-and-feel__css.md",
@@ -62,7 +62,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:46 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:42 GMT"
     },
     "/langgraph-typescript/custom-look-and-feel/headless-ui": {
       "file": "langgraph-typescript__custom-look-and-feel__headless-ui.md",
@@ -74,7 +74,19 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:46 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:42 GMT"
+    },
+    "/langgraph-typescript/custom-look-and-feel/markdown": {
+      "file": "langgraph-typescript__custom-look-and-feel__markdown.md",
+      "sha256": "23c23e27f941d72c8ed628770d9ce7310d649d2086b1b70b866ea4c7e7ba044d",
+      "bytes": 5856,
+      "lines": 159,
+      "routes": [
+        "/custom-look-and-feel/markdown"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Fri, 13 Nov 2026 11:09:43 GMT"
     },
     "/langgraph-typescript/custom-look-and-feel/reasoning-messages": {
       "file": "langgraph-typescript__custom-look-and-feel__reasoning-messages.md",
@@ -86,7 +98,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:47 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:43 GMT"
     },
     "/langgraph-typescript/custom-look-and-feel/slots": {
       "file": "langgraph-typescript__custom-look-and-feel__slots.md",
@@ -98,7 +110,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:47 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:43 GMT"
     },
     "/langgraph-typescript/frontend-tools": {
       "file": "langgraph-typescript__frontend-tools.md",
@@ -110,43 +122,175 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:47 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:43 GMT"
+    },
+    "/langgraph-typescript/generative-ui/a2ui": {
+      "file": "langgraph-typescript__generative-ui__a2ui.md",
+      "sha256": "0f8e42d6af0ecdc28338a7f8730f006e64ed1934b90d0410839e925cf34115d0",
+      "bytes": 6212,
+      "lines": 166,
+      "routes": [
+        "/generative-ui/a2ui"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Fri, 13 Nov 2026 11:09:43 GMT"
     },
     "/langgraph-typescript/generative-ui/a2ui/dynamic-schema": {
       "file": "langgraph-typescript__generative-ui__a2ui__dynamic-schema.md",
-      "sha256": "706aaf55243fb3d837ee3628e759e2205cb024c5938004c08f48d0b5dea1eaf4",
-      "bytes": 22983,
-      "lines": 688,
+      "sha256": "0c143b09612e448165e01a8305d3d3802cca7b04b7bc925f2236e6fc7b4938f4",
+      "bytes": 23139,
+      "lines": 689,
       "routes": [
         "/generative-ui/a2ui/dynamic-schema"
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:46 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:43 GMT"
     },
     "/langgraph-typescript/generative-ui/a2ui/fixed-schema": {
       "file": "langgraph-typescript__generative-ui__a2ui__fixed-schema.md",
-      "sha256": "4ac3504329dd0dcfa10e9a492f3e772e4271dc173d8fc127f1c52407896e7429",
-      "bytes": 20594,
+      "sha256": "7ff973fc20828831c5307f9880624b12db867f412b8939da7a55072e15d6d071",
+      "bytes": 20768,
       "lines": 612,
       "routes": [
         "/generative-ui/a2ui/fixed-schema"
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:46 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:43 GMT"
+    },
+    "/langgraph-typescript/generative-ui/components": {
+      "file": "langgraph-typescript__generative-ui__components.md",
+      "sha256": "dc6999b4bc133947627eee5d00653481311516e376a730401fcd732b07622da8",
+      "bytes": 33693,
+      "lines": 795,
+      "routes": [
+        "/generative-ui/components"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Fri, 13 Nov 2026 11:09:43 GMT"
+    },
+    "/langgraph-typescript/generative-ui/components/catalogs": {
+      "file": "langgraph-typescript__generative-ui__components__catalogs.md",
+      "sha256": "3ba3f9f239ac4890963a19927d3627513ac065d13022f37722e14deb866232d7",
+      "bytes": 23845,
+      "lines": 520,
+      "routes": [
+        "/generative-ui/components/catalogs"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Fri, 13 Nov 2026 11:09:43 GMT"
+    },
+    "/langgraph-typescript/generative-ui/components/from-a2ui": {
+      "file": "langgraph-typescript__generative-ui__components__from-a2ui.md",
+      "sha256": "9117b894688f0625ac145abf2f3076bbdf6053b82e4306aa50f57f3643743b36",
+      "bytes": 16744,
+      "lines": 279,
+      "routes": [
+        "/generative-ui/components/from-a2ui"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Fri, 13 Nov 2026 11:09:43 GMT"
+    },
+    "/langgraph-typescript/generative-ui/components/markdown-mode": {
+      "file": "langgraph-typescript__generative-ui__components__markdown-mode.md",
+      "sha256": "45db4c05775133cb669fd2c56c7fa28fed058e70b90e2a162f0dd273e60b6696",
+      "bytes": 8765,
+      "lines": 188,
+      "routes": [
+        "/generative-ui/components/markdown-mode"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Fri, 13 Nov 2026 11:09:43 GMT"
+    },
+    "/langgraph-typescript/generative-ui/components/standard-catalog": {
+      "file": "langgraph-typescript__generative-ui__components__standard-catalog.md",
+      "sha256": "20f088c1b43fbb739a9ce51770fee4066714349a492f3a820b3899520acf413f",
+      "bytes": 16208,
+      "lines": 238,
+      "routes": [
+        "/generative-ui/components/standard-catalog"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Fri, 13 Nov 2026 11:09:43 GMT"
+    },
+    "/langgraph-typescript/generative-ui/components/state-and-actions": {
+      "file": "langgraph-typescript__generative-ui__components__state-and-actions.md",
+      "sha256": "1c2b02e63cafe78c8636409f3224c472cc3ea8f266bd6164b58132fa46ad5feb",
+      "bytes": 23529,
+      "lines": 556,
+      "routes": [
+        "/generative-ui/components/state-and-actions"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Fri, 13 Nov 2026 11:09:43 GMT"
+    },
+    "/langgraph-typescript/generative-ui/components/surfaces": {
+      "file": "langgraph-typescript__generative-ui__components__surfaces.md",
+      "sha256": "f86be20302b8c0d5ff87215fc3d0c7479bada125f799317658b36794bfd35b39",
+      "bytes": 21296,
+      "lines": 427,
+      "routes": [
+        "/generative-ui/components/surfaces"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Fri, 13 Nov 2026 11:09:43 GMT"
+    },
+    "/langgraph-typescript/generative-ui/components/theming": {
+      "file": "langgraph-typescript__generative-ui__components__theming.md",
+      "sha256": "eb23dbcb35eead207147ec932915eb8c77c5b40c68574e039c38fc97a2b212d6",
+      "bytes": 6812,
+      "lines": 203,
+      "routes": [
+        "/generative-ui/components/theming"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Fri, 13 Nov 2026 11:09:43 GMT"
+    },
+    "/langgraph-typescript/generative-ui/components/transports": {
+      "file": "langgraph-typescript__generative-ui__components__transports.md",
+      "sha256": "99ea6d57d92b9c114bdf096a0e9b6df83ec4fc7d05e31312b79ae31cd9c4cb24",
+      "bytes": 5168,
+      "lines": 139,
+      "routes": [
+        "/generative-ui/components/transports"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Fri, 13 Nov 2026 11:09:43 GMT"
+    },
+    "/langgraph-typescript/generative-ui/mcp-apps": {
+      "file": "langgraph-typescript__generative-ui__mcp-apps.md",
+      "sha256": "de230c4ff347b72ef7a0a8670000b5b109105dd6890406e41efb4a689483cfd7",
+      "bytes": 8554,
+      "lines": 240,
+      "routes": [
+        "/generative-ui/mcp-apps"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Fri, 13 Nov 2026 11:09:44 GMT"
     },
     "/langgraph-typescript/generative-ui/reasoning": {
       "file": "langgraph-typescript__generative-ui__reasoning.md",
-      "sha256": "ec267500ed7296682ba35af3cd436815faf742cb6df48c6c472d76d1d2359c5d",
-      "bytes": 5646,
+      "sha256": "92457cd81ee6cb58e275e007c76ae1aa20dfb7407ab95c9f3db3df7cb170f3ab",
+      "bytes": 5780,
       "lines": 180,
       "routes": [
         "/generative-ui/reasoning"
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:47 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:44 GMT"
     },
     "/langgraph-typescript/generative-ui/state-rendering": {
       "file": "langgraph-typescript__generative-ui__state-rendering.md",
@@ -158,7 +302,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:47 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:44 GMT"
     },
     "/langgraph-typescript/generative-ui/tool-based": {
       "file": "langgraph-typescript__generative-ui__tool-based.md",
@@ -170,7 +314,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:47 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:44 GMT"
     },
     "/langgraph-typescript/generative-ui/tool-rendering": {
       "file": "langgraph-typescript__generative-ui__tool-rendering.md",
@@ -182,7 +326,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:47 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:44 GMT"
     },
     "/langgraph-typescript/headless-threads": {
       "file": "langgraph-typescript__headless-threads.md",
@@ -194,7 +338,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:47 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:44 GMT"
     },
     "/langgraph-typescript/human-in-the-loop": {
       "file": "langgraph-typescript__human-in-the-loop.md",
@@ -206,7 +350,43 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:47 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:44 GMT"
+    },
+    "/langgraph-typescript/human-in-the-loop/governed-actions": {
+      "file": "langgraph-typescript__human-in-the-loop__governed-actions.md",
+      "sha256": "c3ffbf2aa5a8b697765c47f5668c9ac1f3608ae778728bb504b77c18a995214b",
+      "bytes": 7168,
+      "lines": 256,
+      "routes": [
+        "/human-in-the-loop/governed-actions"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Fri, 13 Nov 2026 11:09:44 GMT"
+    },
+    "/langgraph-typescript/human-in-the-loop/headless": {
+      "file": "langgraph-typescript__human-in-the-loop__headless.md",
+      "sha256": "9d4cb9d53f076cf07f709b2a4179632f0688e24b20e46f3e698c1fc0c4ce3e0e",
+      "bytes": 13729,
+      "lines": 430,
+      "routes": [
+        "/human-in-the-loop/headless"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Fri, 13 Nov 2026 11:09:44 GMT"
+    },
+    "/langgraph-typescript/human-in-the-loop/index": {
+      "file": "langgraph-typescript__human-in-the-loop__index.md",
+      "sha256": "1be47ba0da98d7af14cc120d07b6e193a27d31e24128d5491caef10d82cab8cc",
+      "bytes": 8879,
+      "lines": 276,
+      "routes": [
+        "/human-in-the-loop/index"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Fri, 13 Nov 2026 11:09:44 GMT"
     },
     "/langgraph-typescript/human-in-the-loop/interrupt-flow": {
       "file": "langgraph-typescript__human-in-the-loop__interrupt-flow.md",
@@ -218,19 +398,31 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:47 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:44 GMT"
+    },
+    "/langgraph-typescript/human-in-the-loop/useInterrupt": {
+      "file": "langgraph-typescript__human-in-the-loop__useInterrupt.md",
+      "sha256": "684e1d7b1b5a58fccaeb804faf20c8a131de6113750bd0eb4c13d5631736abb7",
+      "bytes": 18677,
+      "lines": 532,
+      "routes": [
+        "/human-in-the-loop/useInterrupt"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Fri, 13 Nov 2026 11:09:44 GMT"
     },
     "/langgraph-typescript/multi-agent/subagents": {
       "file": "langgraph-typescript__multi-agent__subagents.md",
-      "sha256": "53cf28b5b2623b6acaba445db6ea54ca046bbbbde043522d4c2e3c0874176ca7",
-      "bytes": 21594,
-      "lines": 633,
+      "sha256": "9cf08deb9673819582e5b79091fadd9ac4217b687176360f429cc357077ca2e8",
+      "bytes": 22031,
+      "lines": 635,
       "routes": [
         "/multi-agent/subagents"
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:47 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:44 GMT"
     },
     "/langgraph-typescript/multimodal-attachments": {
       "file": "langgraph-typescript__multimodal-attachments.md",
@@ -242,7 +434,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:47 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:44 GMT"
     },
     "/langgraph-typescript/prebuilt-components/chat": {
       "file": "langgraph-typescript__prebuilt-components__chat.md",
@@ -254,7 +446,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:47 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:44 GMT"
     },
     "/langgraph-typescript/prebuilt-components/chat-controls": {
       "file": "langgraph-typescript__prebuilt-components__chat-controls.md",
@@ -266,7 +458,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:47 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:44 GMT"
     },
     "/langgraph-typescript/prebuilt-components/copilot-threads-drawer": {
       "file": "langgraph-typescript__prebuilt-components__copilot-threads-drawer.md",
@@ -278,7 +470,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:47 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:45 GMT"
     },
     "/langgraph-typescript/prebuilt-components/popup": {
       "file": "langgraph-typescript__prebuilt-components__popup.md",
@@ -290,7 +482,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:47 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:44 GMT"
     },
     "/langgraph-typescript/prebuilt-components/sidebar": {
       "file": "langgraph-typescript__prebuilt-components__sidebar.md",
@@ -302,19 +494,19 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:48 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:45 GMT"
     },
     "/langgraph-typescript/programmatic-control": {
       "file": "langgraph-typescript__programmatic-control.md",
-      "sha256": "0dc7435e42a4fd49dfff562d7f6a5ccadfbe36b4858e16757e2b738520e7cd7b",
-      "bytes": 11277,
+      "sha256": "7b097f3950284150d05f27277c79be5d42719f6a6a5cfb7a5a0846c89070ebd6",
+      "bytes": 11334,
       "lines": 345,
       "routes": [
         "/programmatic-control"
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:48 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:45 GMT"
     },
     "/langgraph-typescript/quickstart": {
       "file": "langgraph-typescript__quickstart.md",
@@ -326,19 +518,19 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:48 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:45 GMT"
     },
     "/langgraph-typescript/shared-state": {
       "file": "langgraph-typescript__shared-state.md",
-      "sha256": "fa14f2808c7269e062177009608b881aacc75aca57725d757fc84d87ae88423d",
-      "bytes": 8595,
+      "sha256": "98962cba96ba723b39e6d43550f9282bc866422da7ca441a417b0f6fa835938f",
+      "bytes": 8757,
       "lines": 252,
       "routes": [
         "/shared-state"
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:48 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:45 GMT"
     },
     "/langgraph-typescript/shared-state/agent-readonly": {
       "file": "langgraph-typescript__shared-state__agent-readonly.md",
@@ -350,7 +542,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:48 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:45 GMT"
     },
     "/langgraph-typescript/shared-state/in-app-agent-read": {
       "file": "langgraph-typescript__shared-state__in-app-agent-read.md",
@@ -362,7 +554,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:48 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:45 GMT"
     },
     "/langgraph-typescript/shared-state/in-app-agent-write": {
       "file": "langgraph-typescript__shared-state__in-app-agent-write.md",
@@ -374,7 +566,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:49 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:45 GMT"
     },
     "/langgraph-typescript/shared-state/predictive-state-updates": {
       "file": "langgraph-typescript__shared-state__predictive-state-updates.md",
@@ -386,7 +578,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:49 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:45 GMT"
     },
     "/langgraph-typescript/shared-state/rendering-in-app": {
       "file": "langgraph-typescript__shared-state__rendering-in-app.md",
@@ -398,7 +590,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:49 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:45 GMT"
     },
     "/langgraph-typescript/shared-state/state-inputs-outputs": {
       "file": "langgraph-typescript__shared-state__state-inputs-outputs.md",
@@ -410,7 +602,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:49 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:45 GMT"
     },
     "/langgraph-typescript/shared-state/streaming": {
       "file": "langgraph-typescript__shared-state__streaming.md",
@@ -422,7 +614,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:49 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:45 GMT"
     },
     "/langgraph-typescript/subgraphs": {
       "file": "langgraph-typescript__subgraphs.md",
@@ -434,7 +626,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:49 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:45 GMT"
     },
     "/langgraph-typescript/threads-lifecycle": {
       "file": "langgraph-typescript__threads-lifecycle.md",
@@ -446,7 +638,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:49 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:45 GMT"
     },
     "/langgraph-typescript/voice": {
       "file": "langgraph-typescript__voice.md",
@@ -458,11 +650,23 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 09 Nov 2026 12:31:49 GMT"
+      "date": "Fri, 13 Nov 2026 11:09:45 GMT"
+    },
+    "/langgraph-typescript/webmcp": {
+      "file": "langgraph-typescript__webmcp.md",
+      "sha256": "1f4ef328ca0cb23795c7b9c4bbc9a99d02b6157b98a479c53b03aad0a9bd34d6",
+      "bytes": 7499,
+      "lines": 165,
+      "routes": [
+        "/webmcp"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Fri, 13 Nov 2026 11:09:45 GMT"
     }
   },
   "sitemap": {
-    "fetchedAt": "2026-11-09T12:31:45.378Z",
+    "fetchedAt": "2026-11-13T11:09:42.087Z",
     "urlsUnderRoot": 216,
     "knownUnmapped": [
       "https://docs.copilotkit.ai/langgraph-typescript/AG-UI-Streams",
@@ -514,6 +718,7 @@
       "https://docs.copilotkit.ai/langgraph-typescript/cookbook/arcade",
       "https://docs.copilotkit.ai/langgraph-typescript/cookbook/claude-managed-agents",
       "https://docs.copilotkit.ai/langgraph-typescript/cookbook/daytona",
+      "https://docs.copilotkit.ai/langgraph-typescript/cookbook/google-antigravity",
       "https://docs.copilotkit.ai/langgraph-typescript/cookbook/jev-generative-ui",
       "https://docs.copilotkit.ai/langgraph-typescript/cookbook/manufact",
       "https://docs.copilotkit.ai/langgraph-typescript/cookbook/openbox-governed-copilotkit",
