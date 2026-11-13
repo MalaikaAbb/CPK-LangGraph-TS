@@ -346,6 +346,8 @@ export const NAV: NavGroup[] = [
         status: "partial",
         statusNote:
           "The page's Code tab verbatim (two agents, runtime route, both demo pages). A minimal ./chat and ./design-skill (feeds the openGenerativeUI.designSkill prop the page teaches) are borrowed from the CopilotKit showcase; all suggestion chips left out; makeChatOpenAI swapped for new ChatOpenAI. Advanced variant at /generative-ui/open-generative-ui/advanced. Not yet checked in a browser.",
+      },
+      {
         path: "/generative-ui/components",
         hasDemo: true,
         agentId: "genui",
